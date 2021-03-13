@@ -1,0 +1,114 @@
+---
+title: "R Tricks"
+output: html_notebook
+---
+
+count(category,sort=TRUE,wt=total,name="")
+add_count()
+summarize()
+fct_reorder()+geom_col()+coord_flip()
+fct_lump()
+crossing()
+separate()
+extract()
+
+```{r}
+#load the library
+library(googlesheets4)
+#authenticate the google location by doing this
+gs_auth(new_user=TRUE)
+
+```
+```{r}
+fun <- function(x) x * cos(0.1*exp(x)) * sin(0.1*pi*exp(x))
+fun
+
+plot(fun)
+```
+
+```{r}
+
+library(tidyverse)
+my_list_<-list(
+  c(1,2,6),
+  c(4,7,1),
+  c(9,1,5)
+)
+ #find mean of each element
+my_list_[[1]]%>%mean()
+my_list_[[2]]%>%mean()
+my_list_[[3]]%>%mean()
+
+#Another way
+sapply(my_list_,mean)
+my_list_%>%sapply(mean)
+#another way
+my_list_%>%map(mean)
+
+my_list_%>%map(~.*2)
+```
+```{r}
+library(rvest)
+library(dplyr)
+library(ggplot2)
+hot100page <-("https://www.billboard.com/charts/hot-100")
+hot100 <- read_html(hot100page)
+hot100
+str(hot100)
+
+rank <- hot100 %>% 
+  rvest::html_nodes('body') %>% 
+  xml2::xml_find_all("//span[contains(@class, 'chart-element__rank__number')]") %>% 
+  rvest::html_text()
+artist <- hot100 %>% 
+  rvest::html_nodes('body') %>% 
+  xml2::xml_find_all("//span[contains(@class, 'chart-element__information__artist')]") %>% 
+  rvest::html_text()
+title <- hot100 %>% 
+  rvest::html_nodes('body') %>% 
+  xml2::xml_find_all("//span[contains(@class, 'chart-element__information__song')]") %>% 
+  rvest::html_text()
+billboard_100<- data.frame(rank,
+           artist,
+           title)
+billboard_100%>%head(10)
+
+```
+```{r}
+library(imager)
+getwd()
+setwd("/Users/steph/OneDrive/Documents/R Projeccts")
+file <- system.file('trini.png',package='imager')
+
+im <- load.image(file)
+
+plot(im) #Parrots!
+```
+
+
+```{r}
+library(png)
+myurl <- "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Jupiter_%28transparent%29.png/242px-Jupiter_%28transparent%29.png"
+z <- tempfile()
+download.file(myurl,z,mode="wb")
+pic <- readPNG(z)
+file.remove(z) # cleanup
+dim(pic)
+
+png("plot.png", width = 5, height = 4, units = "in", res = 400)
+  par(mar = c(3,3,0.5,0.5))
+  image(volcano)
+  addImg(pic, x = 0.3, y = 0.5, width = 0.2)
+dev.off()
+```
+
+
+```{r}
+library(blogdown)
+```
+
+
+```{r}
+blogdown::new_site()
+```
+

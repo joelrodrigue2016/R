@@ -1,0 +1,2459 @@
+---
+title: "Joel's Rnotebook"
+output: html_notebook
+---
+
+ This is my bluebook of things that I have done using R. 
+ 
+----- FUN STARTING EXAMPLE -----
+ 
+----- SCATTERPLOTS -----
+
+
+```{r}
+mlbPlayers = read.table(file=file.choose(),
+                        header=T, sep=" ",
+                        na.strings="`",
+                        stringsAsFactors=F)
+
+playerData = mlbPlayers[,c("RBI","AVG")]
+ 
+# Create the file
+png(file="player_rbi_avg.png")
+ 
+# Create the plot
+plot(x=playerData$RBI, y=playerData$AVG,
+     xlab="RBI", ylab="AVG", main="RBIs and Average")
+ 
+# Create the file
+dev.off()
+```
+The data was generated in a png file as indicatedabove.
+
+
+This is how we can identify the data types
+```{r}
+print(class(4))
+print(class(4L))
+print(class(T))
+print(class(1+4i))
+print(class("sample"))
+print(class(charToRaw("Sample")))
+
+
+# with this information we can as R:
+
+#is integer()
+#is numeric()
+#is vector()
+```
+
+how to print math operations
+
+```{r}
+sprintf("4+5 = %d",4+5)
+sprintf("4-5 = %d", 4-5)
+sprintf("4/5 = %f", 4/5)
+sprintf("4/5 = %1.3f" ,4/5)  ## This is used for significant figues
+sprintf("4*5 = %d", 4*5)
+sprintf("5 %% 4 = %d", 5%%4) ## floor division
+sprintf("4^2 =%d", 4^2)
+```
+
+These are vectors
+
+```{r}
+numbers = c(3,2,0,1,8)
+numbers
+
+numbers[1]
+length(numbers)
+
+numbers[length(numbers)]
+numbers[-1]
+numbers[2:3]
+numbers[5]=1
+numbers[c(4,5)]=2
+numbers
+
+sort(numbers)
+
+onetoten = 1:10
+
+add3 = seq(from =3, to=27, by =3)
+
+add3
+
+evens = seq(from = 2, by=2, length.out = 10)
+evens
+
+
+sprintf("4 in evens %s", 4 %in% evens) #3 identifying number inside an object
+
+rep(x = 2, times = 5, each = 2) # repeating a number 5 times
+
+rep(x=c(1,2,3), times=2, each=2) #repeating numbers 2 times
+
+```
+Relational operators (logic)
+```{r}
+sprintf("4 == 5 : %s", 4==5)
+sprintf("4 != 5 : %s", 4 !=5)
+sprintf("4 >  5 : %s", 4 > 5)
+sprintf("4 <  5 : %s", 4<5)
+sprintf("4 >= 5 : %s", 4 >=5)
+sprintf("4 <= 5 : %s", 4<=5)
+
+oneto20 = c(1:20)
+isEven = oneto20 %%2==0
+isEven
+
+
+justEvens = oneto20[oneto20 %%2==0]
+justEvens
+```
+Logical operators
+```{r}
+cat("True && False = ", T && F, "\n")
+cat("True || False = ", T || F, "\n")
+cat("!True = ", !T, "\n")
+
+```
+
+
+
+```{r}
+age = readline(prompt="Enter age: ")
+if (age >= 18){
+  noquote("Drive and Vote")  
+} else if (age >=16){
+  noquote("Drive")
+} else {
+  noquote("Wait")
+} 
+
+  
+```
+
+This section entails the Switch case in R
+```{r}
+grade = "P"
+switch(grade,
+       "A" = noquote("great"),
+       "B" = noquote("good"),
+       "C" = noquote("OK"),
+       "D" = noquote("Bad"),
+       "F" = noquote("Terrible"))
+        noquote("No such grade")
+                   
+```
+
+Strings
+```{r}
+# ----- STRINGS -----
+str1 = "This is a string"
+ 
+# String length
+nchar(str1)
+ 
+# You can compare strings where later letters are considered
+# greater than
+sprintf("Dog > Egg : %s", "Dog" > "Egg")
+sprintf("Dog == Egg : %s", "Dog" == "Egg")
+ 
+# Combine strings and define sperator if any
+str2 = paste("Owl", "Bear", sep="")
+str2
+ 
+# Remove bear from the string
+substr(x=str2, start=4, stop=7)
+ 
+# Substitute one string with another
+sub(pattern="Owl", replacement="Hawk", x=str2)
+ 
+# Substitute all matches
+gsub(pattern="Egg", replacement="Chicken", x="Egg Egg")
+ 
+# Split string into vector
+strVect = strsplit("A dog ran fast", " ")
+ 
+strVect
+
+```
+
+
+```{r}
+str1 = "Joel is "
+str2 = "Nieve's son"
+str3= strsplit("Joel just graduated a week ago, and now he lives in tampa.", " ")
+str3  # with air quotes 
+noquote(str3)  # with noquotes
+
+```
+ ----- FACTORS ------
+Factors are used when you have a limited number of values
+that are strings or integers
+ 
+Create a factor vector
+```{r}
+direction = c("up", "left", "right","down", "left", "up")
+factorDir = factor(direction)
+is.factor(factorDir)
+
+factorDir
+levels(x=factorDir)
+
+# You can define your levels and their orders
+dow = c("Monday", "Tuesday", "Wednesday", "Thursday",
+        "Friday", "Saturday", "Sunday")
+ 
+wDays = c("Tuesday", "Thursday", "Monday")
+
+wdFact= factor(x= wDays, levels=dow, ordered = T)
+wdFact
+ 
+
+```
+
+----- DATA FRAMES -----
+ A Data Frame is a table which contains any type 
+of data and an equal amount of data in each column
+ 
+Each row is called a record and each column a varaible
+ 
+Create customer data frame
+```{r}
+custData= data.frame(name = c("Tom", "Sally", "Sue"),
+                     age=c(43,28,35),
+                     stringsAsFactors = F)
+custData
+
+custData[1,1]
+custData[1,1:2]
+
+custData[1:3,2]
+dim(custData)
+##binding or appending data to the table
+recordMark= data.frame(name="Mark", age=33)
+custData = rbind(custData,recordMark)
+custData
+
+
+# Add a column representing debt
+debt = c(0, 25.50, 36, 48.19)
+custData = cbind(custData, debt)
+custData
+ 
+# Check if money is owed
+owesMoney = custData[custData$debt > 0,]  ##only shows the customers that owe money
+owesMoney
+```
+
+```{r}
+num = 1
+repeat{
+  print(num)
+  num = num+1
+  if(num >5){
+    break
+  }
+}
+```
+
+
+```{r}
+
+num = 5
+# Repeat while condition is true
+while(num > 0){
+  num = num - 1
+  
+  # next skips the rest of the loop and jumps
+  # back to the top
+  if(num %% 2 == 0){
+    next
+  }
+  print(num)
+}
+```
+
+```{r}
+for(i in 1:5)
+  print(i)
+```
+
+
+```{r}
+# ----- MATRICES -----
+# A Matrix stores values in rows and columns
+ 
+# Create a Matrix with a single column
+matrix1 = matrix(data=c(1,2,3,4))
+matrix1
+ 
+# Create a matrix with defined rows and columns
+matrix2 = matrix(data=c(1,2,3,4), nrow=2, ncol=2)
+matrix2
+ 
+# You can also fill by row (You can use T or TRUE)
+matrix3 = matrix(data=c(1,2,3,4), nrow=2, ncol=2, byrow=T)
+matrix3
+ 
+# Get a Matrix dimension
+dim(matrix3)
+ 
+# A value at row, column
+matrix3[1,2]
+ 
+# Get a whole row
+matrix3[1,]
+ 
+# Get a whole column
+matrix3[,2]
+ 
+# Combine vectors to make a Matrix
+matrix4 = rbind(1:3, 4:6, 7:9)
+matrix4
+ 
+# Get 2nd and 3rd row
+matrix4[2:3,]
+ 
+# Get 2nd and 3rd row by ommitting the 1st
+matrix4[-1,]
+ 
+# Change the first value
+matrix4[1,1] = 0
+matrix4
+ 
+# Change the 1st row
+matrix4[1,] = c(10,11,12)
+matrix4
+
+```
+----- MULTI-DIMENSIONAL ARRAYS -----
+You can also create Matrices in layers
+ 
+Create a MDA with 2 rows, columns and layers
+```{r}
+
+array1 = array(data=1:8, dim=c(2,2,2))
+array1
+ 
+# Get a value
+array1[1,2,2]
+```
+ ----- FUNCTIONS -----
+A function is R is an object that performs operations
+on passed attributes and then returns results
+or simply control back
+```{r}
+getSum = function(num1, num2){
+  return(num1 + num2)
+}
+ 
+sprintf("5 + 6 = %d", getSum(5,6))
+
+
+# If there is no return the last expression is returned
+# You can define default attribute values
+getDifference = function(num1=1, num2=1){
+  num1 - num2
+}
+ 
+sprintf("5 - 6 = %d", getDifference(5,6))
+ # Return multiple values in a list
+makeList = function(theString){
+  return (strsplit(theString, " "))
+}
+ 
+makeList("Random Words")
+ 
+# Handling missing arguments
+missFunc = function(x){
+  if(missing(x)){
+    return("Missing Argument")
+  } else {
+    return(x)
+  }
+}
+ 
+missFunc()
+
+
+
+
+```
+
+```{r}
+# Excepting variable number of arguments with ellipses
+getSumMore = function(...){
+  numList = list(...)
+  sum = 0
+  for(i in numList){
+    sum = sum + i
+  }
+  sum
+}
+ 
+getSumMore(1,2,3,4)
+ 
+# Disposable / Anonymous Functions are great for 
+# quick operations like doubling everything in a list
+numList = 1:10
+dblList = (function(x) x * 2)(numList)
+dblList
+ 
+# Closures are functions created by functions
+# Create a function that finds x to a user defined
+# power
+power = function(exp){
+  function(x){
+    x ^ exp
+  }
+}
+ 
+cubed = power(3)
+cubed(2)
+cubed(1:5)
+ 
+# You can store functions in lists
+addFunc = list(
+  add2 = function(x) x + 2,
+  add3 = function(x) x + 3
+)
+ 
+addFunc$add2(5)
+ 
+```
+
+
+----- EXCEPTION HANDLING -----
+Used to gracefully handle errors
+I handle a division with string error
+```{r}
+
+ 
+divide = function(num1, num2){
+  tryCatch(
+    num1 / num2,
+    error = function(e) {
+      if(is.character(num1) || is.character(num2)){
+        print("Can't Divide with Strings")
+      }
+  })
+}
+ 
+divide(10,"5")
+```
+
+```{r}
+# ----- READING WRITING FILES -----
+# Create a text file with headers fname lname sex
+# and the data in a txt file Use `for missing values
+# Save in the same directory as your R file
+ 
+# Supply the file to read, whether the 1st line is 
+# headers, what seperates the data, what is being used
+# for missing data and false because you don't want to
+# convert string vectors to factors
+ 
+# myPeople is a data frame
+myPeople = read.table(file=file.choose(),
+                      header=T, sep=" ",
+                      na.strings="`",
+                      stringsAsFactors=F)
+myPeople
+ 
+# Add another person
+donnaRecord = data.frame(fname="Donna",
+                         lname="Heyward",
+                         sex="female")
+myPeople = rbind(myPeople, donnaRecord)
+ 
+# Update a record
+myPeople[7,2] = "Smith"
+ 
+# Update the file by supplying the data.frame,
+# the file to write, seperator, na, whether to
+# quote strings, whether to include row numbers
+write.table(x=myPeople, file=file.choose(),
+            sep=" ", na="`",
+            quote=F, row.names=F)
+ 
+# Get 1st 3 records
+head(myPeople, 3)
+ 
+# Get remaining records
+tail(myPeople)
+```
+
+```{r}
+# ----- BASIC PLOTTING -----
+# R provides great plotting tools
+ 
+# Plotting x y coordinates from a matrix
+# 1st 5 are x and 2nd 5 are y
+xy1 = matrix(data=c(1,2,3,4,5,
+                    1,2,3,4,5), nrow=5, ncol=5)
+plot(xy1)
+ 
+# Draw a line
+x2 = c(1,2,3,4,5)
+y2 = c(1,2,3,4,5)
+plot(x2, y2, type="l")
+ 
+# Points and lines
+plot(x2, y2, type="b")
+ 
+# Points and lines with no space around points,
+# labels, a blue line (Find more with colors())
+plot(x2, y2, type="o", 
+     main="My Plot", xlab="x axis", ylab="y axis",
+     col="steelblue")
+ 
+# pch (1-25) defines different points
+# lty (1-6) defines different lines
+# xlim defines the max and min x plotting region
+# ylim defines the max and min y plotting region
+plot(x2, y2, type="b", pch=2, lty=2,
+     xlim=c(-8,8), ylim=c(-8,8))
+ 
+# Multiple plots
+plot(x2, y2, type="b")
+ 
+# Adds straight lines at 2 and 4 coordinates
+abline(h=c(2,4), col="red",lty=2)
+ 
+# Draw a 2 segmented lines with starting and ending x
+# and y points
+segments(x0=c(2,4), y0=c(2,2), x1=c(2,4), y1=c(4,4),
+         col="red",lty=2)
+ 
+# Draw an arrow
+arrows(x0=1.5, y0=4.55, x1=2.7, y1=3.3, col="blue")
+ 
+# Print Text
+text(x=1.25, y=4.75, labels="Center")
+ 
+# Load a built in data.frame
+plot(faithful)
+ 
+# Highlight eruptions with a waiting time greater
+# then 4
+eruptions4 = with(faithful, faithful[eruptions > 4,])
+ 
+# Draw specific points
+points(eruptions4, col="red", pch=3)
+ 
+ 
+```
+
+```{r}
+ 
+# ----- MATH FUNCTIONS -----
+sqrt(x=100)
+ 
+# Get the power you raise the base to get x
+log(x=4, base=2)
+ 
+# Euler's number 2.718 to the power of x
+exp(x=2)
+ 
+# Sum all vector values
+sum(c(1,2,3))
+ 
+# Find the mean (average)
+randD1 = c(1,5,6,7,10,16)
+mean(randD1)
+ 
+# The median (Middle Number or avg of middle 2)
+median(randD1)
+ 
+# Minimum value
+min(randD1)
+ 
+# Maximum value
+max(randD1)
+ 
+# Min and max
+range(randD1)
+ 
+# Rounding
+ceiling(4.5)
+floor(4.5)
+ 
+# Cumulatives
+cumsum(c(1,2,3))
+cumprod(c(1,2,3))
+cummax(c(7:9, 4:6, 1:3))
+cummin(c(4:6, 1:3, 7:9))
+ 
+# Generating Random samples
+# Flipping a coin 10 times and weigh the probability
+# of the next flip based on the previous
+sample(0:1,10,replace=T)
+ 
+sample(1:20,10,replace=T)
+```
+
+
+```{r}
+# ----- PIE CHARTS -----
+# List percentages
+foodPref = c(15, 35, 10, 25, 15)
+ 
+# Labels associated with percentages
+foodLabels = c("Spaghetti", "Pizza", "Mac n' Cheese",
+           "Chicken Nuggets", "Tacos")
+ 
+# Where to save the image
+png(file="child_food_pref.png")
+ 
+# Colors used for each option
+colors = rainbow(length(foodPref))
+ 
+# Create the chart
+pie(foodPref, foodLabels, main="Food Prefs",
+    col=colors)
+ 
+# Print legend and cex shrinks the size
+legend("topright", c("Spaghetti", "Pizza", "Mac n' Cheese",
+                     "Chicken", "Tacos"), cex=0.8,
+       fill=colors)
+ 
+# Save the chart
+dev.off()
+ 
+# 3D Pie Chart
+# Download package in console install.packages("plotrix")
+# Get the library
+library(plotrix)
+ 
+# Name the chart file
+png(file="3d_child_food_pref.png")
+ 
+# Create the chart
+pie3D(foodPref, labels=foodLabels, explode=0.1,
+      start=pi/2, main="Food Prefs", labelcex=0.8)
+ 
+# Save the chart
+dev.off()
+```
+
+```{r}
+# ----- BAR CHARTS -----
+# Define the bar chart file
+png(file="food_pref_bar_chart.png")
+ 
+# Plot the chart
+barplot(foodPref, names.arg=foodLabels, xlab="Votes",
+        ylab="Food Options", col=colors, 
+        main="Food Prefs")
+ 
+# Save File
+dev.off()
+ 
+```
+----- REGRESSION ANALYSIS -----
+Used to study a relationship between 2 separate 
+pieces of data (What is the relation between batting average and RBIS)
+```{r}
+
+ 
+# Create relationship model between AVG and RBIs
+relation = lm(playerData$RBI~playerData$AVG)
+ 
+# Create file 
+png(file="RBI_AVG_Regression.png")
+ 
+# Plot the chart
+plot(playerData$AVG, playerData$RBI, 
+     main="AVG & RBI Regression", 
+     abline(lm(playerData$RBI~playerData$AVG)),
+     xlab="AVG", ylab="RBIs")
+ 
+# Save chart
+dev.off()
+```
+----- MULTIPLE REGRESSION -----
+Used to study the impact on one variable from numerous others
+Estimate RBIs based on other player stats
+```{r}
+
+playerData2 = mlbPlayers[,c("RBI","AVG","HR","OBP",
+                            "SLG","OPS")]
+ 
+# Create the relationship model
+relation2 = lm(playerData2$RBI ~ playerData2$AVG + 
+                 playerData2$HR + playerData2$OBP +
+                 playerData2$SLG + playerData2$OPS)
+ 
+sprintf("Intercept : %f1.4", coef(relation2)[1])
+ 
+# How stats effect RBIs
+sprintf("AVG : %f1.4", coef(relation2)[2])
+sprintf("HR : %f1.4", coef(relation2)[3])
+sprintf("OBP : %f1.4", coef(relation2)[4])
+sprintf("SLG : %f1.4", coef(relation2)[5])
+sprintf("OPS : %f1.4", coef(relation2)[6])
+ 
+# Calculate expected RBIs based on stats
+# Evan Longoria
+# RBIs   AVG   HR   OBP   SLG   OPS
+# 86     .261  20  .313  .424  .737
+RBIGuess = -5.05 + (372.96 * .261) + (2.56 * 20) +
+  (-5.41 * .313) + (-167.37 * .424)
+RBIGuess
+```
+
+```{r}
+plot(faithful,main="Eruptions")
+eruptions4= with(faithful,faithful[eruptions >4,])
+points(eruptions4,col="blue", pch=10) ##these are types of dots and colors
+```
+
+```{r}
+data = volcano[,1]
+plot(data,main="Eruptions",las=1, bty="l", col="red", pch=19)
+
+```
+
+```{r}
+ plot(faithful, las=1, bty="l", col="red", pch=19)
+```
+This is a simple example of Regression
+```{r}
+mouse.data = data.frame(
+  weight=c(0.9,1.8,2.4,3.5,3.9,4.4,5.1,5.6,6.3),
+  size=c(1.4,2.6,1.0,3.7,5.5,3.2,3.0,4.9,6.3))
+
+plot(mouse.data$weight,mouse.data$size,col="red",type="b",xlab="weight",ylab = "Size", main="Mouse data")
+
+
+
+## create a "linear model" - that is, do the regression
+mouse.regression <- lm(size ~ weight, data=mouse.data)
+
+
+## add the regression line to our x/y scatter plot
+abline(mouse.regression, col="blue")
+## generate a summary of the regression
+summary(mouse.regression)
+```
+
+```{r}
+library(mosaic)
+f <- makeFun(m * x + b ~ x, m = 3.5, b = 10)
+f(x = 2)
+
+g <- makeFun(A * x * cos(pi * x * y) ~ x + y, A = 3)
+g
+function (x, y, A = 3)
+A * x * cos(pi * x * y)
+g(x = 1, y = 2)
+```
+
+
+```{r}
+plotFun(A * exp(k * t) * sin(2 * pi * t/P) ~ t + k, t.lim = range(0, 10), k.lim = range(-0.3,0), A = 10, P = 4)
+```
+
+
+```{r}
+library(manipulate)
+plotFun(A * exp(k * t) * sin(2 * pi * t/P) ~ t + k, t.lim = range(0, 10),k.lim = range(-0.3,0), A = 10, P = 4, surface = TRUE)
+```
+
+
+```{r}
+plotFun(dt(t, df) ~ t + df, t.lim = range(-3,3), df.lim = range(1,10))
+```
+
+
+```{r}
+library(mosaic)
+library(mosaicCalc)
+D(sin(x) ~ x)
+
+D(A * x^2 * sin(y) ~ x)
+D(A * x^2 * sin(y) ~ x + y)
+```
+
+
+```{r}
+findZeros(sin(t) ~ t, nearest = 5, near = 10)
+findZeros(sin(t) ~ t, near = 0, within = 8)
+findZeros(x * y^2 - 8 ~ x & y, sin(x * y) - 0.5 ~ x & y)
+findZeros(x * y^2 - 8 ~ x & y, sin(x * y) - 0.5 ~ x & y, near = c(x = 20, y = 0),
+within = c(x = 5, y = 1))
+```
+
+
+```{r}
+findZeros(x^2 + y^2 + z^2 - 10 ~ x & y & z, near = 0, within = 4)
+```
+
+```{r}
+s1 <- findZeros(x^2 + y^2 + z^2 - 10 ~ x & y & z, near = 0, within = 10, nearest = 1000)
+cloud(z ~ x + y, data = s1, pch = 19)
+```
+
+```{r}
+D = function(f,delta=.000001){
+function(x){ (f(x+delta) - f(x-delta))/(2*delta)} }
+f = function(x){ x^2 + 2*x }
+plot(f, 0, 10)
+```
+
+```{r}
+f = function(x){ x^2 + 2*x }
+plot(f, 0, 10)
+plot(D(f), 0, 10)
+```
+
+```{r}
+plot(D(D(f)), 0, 10)
+```
+There are times when you want to arrange or superimpose several figures to create a single meaningful plot. Doing so requires fine control over the placement of the figures. You can accomplish this with the fig= graphical parameter. In the following listing, two box plots are added to a scatter plot to create a single enhanced graph. 
+```{r}
+opar <- par(no.readonly=TRUE)
+par(fig=c(0, 0.8, 0, 0.8))
+plot(mtcars$wt, mtcars$mpg,   
+xlab="Miles Per Gallon", ylab="Car Weight") 
+par(fig=c(0, 0.8, 0.55, 1), new=TRUE) 
+boxplot(mtcars$wt, horizontal=TRUE, axes=FALSE)
+
+par(fig=c(0.65, 1, 0, 0.8), new=TRUE)
+boxplot(mtcars$mpg, axes=FALSE) 
+mtext("Enhanced Scatterplot", side=3, outer=TRUE, line=-3) 
+par(opar)
+```
+
+You  may wonder why probability functions aren’t listed with the statistical functions (it was really bothering you, wasn’t it?). Although probability functions are statistical by definition, they’re unique enough to deserve their own section. Probability functions are often used to generate simulated data with known characteristics and to calculate probability values within user-written statistical functions. In R, probability functions take the form
+where the first letter refers to the aspect of the distribution returned:
+d = density 
+p = distribution function 
+q = quantile function 
+r = random generation (random deviates)
+```{r}
+x <- pretty(c(-3,3), 30) 
+y <- dnorm(x)
+plot(x, y,  
+     type = "o",  
+     xlab = "Normal Deviate",  
+     ylab = "Density",  
+     yaxs = "i" ,
+     col="red")
+```
+
+The first barplot function  produces a stacked bar plot, whereas the second produces a grouped bar plot. We’ve also added the col option  to add color to the bars plotted. The legend.text parameter  provides bar labels for the legend (which are only useful when height is a matrix). In chapter 3, we covered ways to format and place the legend to maximum benefit. See if you can rearrange the legend to avoid overlap with the     bars.
+```{r}
+library(vcd)
+counts=  table(Arthritis$Improved, Arthritis$Treatment)
+barplot(counts, 
+        main="Stacked Bar Plot",  
+        xlab="Treatment",ylab="Frequency", 
+        col=c("red", "yellow","green"),  
+        legend=rownames(counts))           
+       
+```
+
+
+```{r}
+barplot(counts, 
+        main="Grouped Bar Plot",  
+        xlab="Treatment", 
+        ylab="Frequency",   
+        col=c("red", "yellow", "green"),         legend=rownames(counts), beside=TRUE)
+```
+
+
+```{r}
+par(mfrow=c(2,2)) 
+
+hist(mtcars$mpg) 
+
+hist(mtcars$mpg,   
+     breaks=12, 
+     col="red",    
+     xlab="Miles Per Gallon", 
+     main="Colored histogram with 12 bins")
+
+hist(mtcars$mpg, 
+     freq=FALSE,   
+     breaks=12,   
+     col="red",    
+     xlab="Miles Per Gallon",  
+     main="Histogram, rug plot, density curve")
+
+rug(jitter(mtcars$mpg))
+lines(density(mtcars$mpg), col="blue", lwd=2) 
+
+x <- mtcars$mpg 
+h<-hist(x, 
+        breaks=12, 
+        col="red",  
+        xlab="Miles Per Gallon", 
+        main="Histogram with normal curve and box")
+
+xfit<-seq(min(x), max(x), length=40)
+yfit<-dnorm(xfit, mean=mean(x), sd=sd(x))
+yfit <- yfit*diff(h$mids[1:2])*length(x) 
+lines(xfit, yfit, col="blue", lwd=2)
+box() 
+
+```
+
+Kernel density plots In  
+ the previous section, you saw a kernel density plot superimposed on a histogram. Technically, kernel density estimation is a nonparametric method for estimating the probability density function of a random variable. Although the mathematics are beyond the scope of this text, in general kernel density plots can be an effective way to view the distribution of a continuous variable. The format for a density plot (that’s not being superimposed on another graph) is
+plot(density(x)) 
+ where x is a numeric vector. Because the plot() function  begins a new graph, use the lines() function  (listing 6.6) when superimposing a density curve on an existing graph. 
+```{r}
+par(mfrow=c(2,1)) 
+d <- density(mtcars$mpg)       
+plot(d)    
+
+d <- density(mtcars$mpg)       
+plot(d, main="Kernel Density of Miles Per Gallon")  
+
+polygon(d, col="red", border="blue")                       
+rug(mtcars$mpg, col="brown")
+```
+
+
+```{r}
+dotchart(mtcars$mpg, labels=row.names(mtcars), cex=.7, 
+         main="Gas Mileage for Car Models",  
+         xlab="Miles Per Gallon") 
+x <- mtcars[order(mtcars$mpg),]
+x$cyl <- factor(x$cyl)                                  
+x$color[x$cyl==4] = "red"                                      
+x$color[x$cyl==6] = "blue"                                     
+x$color[x$cyl==8] = "darkgreen" 
+
+dotchart(x$mpg,    
+         labels = row.names(x),           
+         cex=.7,                                                          
+         groups = x$cyl, 
+         gcolor = "black",  
+         color = x$color,    
+         pch=19,      
+         main = "Gas Mileage for Car Models\ngrouped by cylinder",         
+         xlab = "Miles Per Gallon") 
+```
+
+
+```{r}
+
+library(MASS) 
+attach(UScereal)
+y <- cbind(calories, fat, sugars)
+aggregate(y, by=list(shelf), FUN=mean)
+center <- colMeans(y) 
+n <- nrow(y) 
+p <- ncol(y) 
+cov <- cov(y) 
+d <- mahalanobis(y,center,cov) 
+coord <- qqplot(qchisq(ppoints(n),df=p),   
+                d, main="Q-Q Plot Assessing Multivariate Normality",   
+                ylab="Mahalanobis D2") 
+abline(a=0,b=1) 
+identify(coord$x, coord$y, labels=row.names(UScereal)) 
+
+```
+important functions
+pwr.2p.test() Two proportions (equal n)
+pwr.2p2n.test() Two proportions (unequal n)
+pwr.anova.test() Balanced one-way ANOVA
+pwr.chisq.test() Chi-square test
+pwr.f2.test() General linear model
+pwr.p.test() Proportion (one sample)
+pwr.r.test() Correlation
+pwr.t.test() t-tests (one sample, two sample, paired)
+pwr.t2n.test() t-test (two samples with unequal n)
+
+```{r}
+library(pwr) 
+es <- seq(.1, .5, .01)   
+nes <- length(es)
+
+samsize <- NULL     
+for (i in 1:nes){  
+  result <- pwr.anova.test(k=5, f=es[i], sig.level=.05, power=.9)  
+  samsize[i] <- ceiling(result$n)   
+  }                                                                    
+plot(samsize,es, type="l", lwd=2, col="red",    
+     ylab="Effect Size",          
+     xlab="Sample Size (per cell)",     
+     main="One Way ANOVA with Power=.90 and Alpha=.05")   
+
+```
+ 
+```{r}
+library(pwr) 
+r <- seq(.1,.5,.01) 
+nr <- length(r)
+p <- seq(.4,.9,.1)    
+np <- length(p)    
+
+samsize <- array(numeric(nr*np), dim=c(nr,np)) 
+for (i in 1:np){ 
+  for (j in 1:nr){    
+   result <- pwr.r.test(n = NULL, r = r[j],  
+   sig.level = .05, power = p[i],  
+   alternative = "two.sided")   
+   samsize[j,i] <- ceiling(result$n) 
+  } 
+  
+}
+
+xrange <- range(r)
+yrange <- round(range(samsize)) 
+colors <- rainbow(length(p))
+plot(xrange, yrange, type="n",   
+     xlab="Correlation Coefficient (r)",  
+     ylab="Sample Size (n)" )
+
+for (i in 1:np){ 
+  lines(r, samsize[,i], type="l", lwd=2, col=colors[i])
+  }
+abline(v=0, h=seq(0,yrange[2],50), lty=2, col="grey89")
+abline(h=0, v=seq(xrange[1],xrange[2],.02), lty=2, 
+       col="gray89")
+title("Sample Size Estimation for Correlation Studies\n    
+      Sig=0.05 (Two-tailed)")
+legend("topright", title="Power", as.character(p),   
+       fill=colors) 
+```
+asypow :Power calculations via asymptotic likelihood ratio methods.
+
+PwrGSD: Power analysis for group sequential designs.
+
+pamm: Power analysis for random effects in mixed models.
+
+powerSurvEpi: Power and sample size calculations for survival analysis in epidemiological studies.
+
+powerpkg: Power analyses for the affected sib pair and the TDT (transmission disequilibrium test) design.
+
+powerGWASinteraction: Power calculations for interactions for GWAS.
+
+pedantics: Functions to facilitate power analyses for genetic studies  of natural populations.
+
+gap: Functions for power and sample size calculations in  case-cohort designs
+ssize.fdr: Sample size calculations for microarray experiments.
+
+
+```{r}
+attach(mtcars)
+plot(wt, mpg, 
+     main="Basic Scatter plot of MPG vs. Weight", 
+     xlab="Car Weight (lbs/1000)", 
+     ylab="Miles Per Gallon ", pch=19)
+
+abline(lm(mpg~wt), col="red", lwd=2, lty=1)                        
+lines(lowess(wt,mpg), col="blue", lwd=2, lty=2) 
+
+```
+
+
+```{r}
+set.seed(1234)
+
+n <- 10000 
+c1 <- matrix(rnorm(n, mean=0, sd=.5), ncol=2)
+c2 <- matrix(rnorm(n, mean=3, sd=2), ncol=2) 
+mydata <- rbind(c1, c2) 
+mydata <- as.data.frame(mydata) 
+names(mydata) <- c("x", "y")
+with(mydata,   
+     plot(x, y, pch=19, main="Scatter Plot with 10,000 Observations"))
+with(mydata,     smoothScatter(x, y, main="Scatterplot Colored by Smoothed Densities")) 
+
+```
+
+
+```{r}
+library(hexbin)
+with(mydata, {    
+  bin <- hexbin(x, y, xbins=50)     
+  plot(bin, main="Hexagonal Binning with 10,000 Observations")     })
+
+```
+
+
+```{r}
+library(IDPmisc)
+with(mydata,  
+     iplot(x, y, main="Image Scatter Plot with Color Indicating Density")) 
+```
+
+
+```{r}
+library(scatterplot3d)
+attach(mtcars) 
+scatterplot3d(wt, disp, mpg,   
+              main="Basic 3D Scatter Plot")
+```
+```{r}
+library(scatterplot3d)
+attach(mtcars)
+scatterplot3d(wt, disp, mpg, 
+              pch=16,      
+              highlight.3d=TRUE,   
+              type="h",     
+              main="3D Scatter Plot with Vertical Lines")
+```insya
+
+
+```{r}
+library(scatterplot3d)
+attach(mtcars)
+s3d <-scatterplot3d(wt, disp, mpg, 
+                    pch=16,     
+                    highlight.3d=TRUE,  
+                    type="h",  
+                    main="3D Scatter Plot with Vertical Lines and Regression Plane")
+fit <- lm(mpg ~ wt+disp)
+s3d$plane3d(fit) 
+```
+
+this plot will show up on a separate window.
+```{r}
+library(rgl)
+attach(mtcars)
+plot3d(wt, disp, mpg, col="red", size=5) 
+
+## this plot will show up on a separate window.
+
+```
+
+this plot will show up on a separate window.
+```{r}
+library(Rcmdr) 
+attach(mtcars)
+scatter3d(wt, disp, mpg)
+
+```
+
+
+```{r}
+library(psych)
+fa.parallel(Harman23.cor$cov, n.obs=302, fa="pc", n.iter=100, show.legend=FALSE, main="Scree plot with parallel analysis") 
+```
+
+
+```{r}
+
+library("VIM") 
+aggr(sleep, prop=FALSE, numbers=TRUE)
+
+```
+ 
+```{r}
+marginplot(sleep[c("Gest","Dream")], pch=c(20),            col=c("darkgray", "red", "blue")) 
+```
+
+
+```{r}
+library(lattice) 
+histogram(~height | voice.part, data = singer, 
+          main="Distribution of Heights by Voice Pitch",  
+          xlab="Height (inches)") 
+```
+
+
+```{r}
+my_data<-read.csv("Financial_Sample.csv")
+
+head(my_data) #only shows the first 6 sets of data
+tail(my_data) #only shows the last 6 sets of data
+#view(my_data) #shows all the data
+
+my_data[1,3]
+my_data[,5]
+
+## start analysus
+
+my_data %>% #and then (pipe operator)
+  select(Country,Units.Sold,Sale.Price) %>% #and then (pipe operator)
+  filter(Sale.Price < 24 & Units.Sold >300000  )%>% #and then (pipe operator)
+  arrange(Units.Sold)
+
+```
+
+
+```{r}
+require(tidyverse)
+#view(starwars)
+starwars %>% # this means and then...
+  select(gender,mass,height,species)%>% # this means and then...
+  filter(species== "Human")%>% # this means and then...
+  na.omit()%>% # this means and then...
+  mutate(height=height/100)%>% # this means and then...
+  mutate(BMI=mass/height^2)%>% # this means and then...
+  group_by(gender)%>% # this means and then...
+  summarise(Average_BMI= mean(BMI))
+
+  
+
+```
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+firstnames=c("Joel","Moises")
+lastnames = c("Rodriguez", "Rodriguez")
+paste(firstnames,lastnames)
+
+print(digits=9,pi)
+
+
+```
+ 
+```{r}
+library("fortunes")
+fortune("This is R")
+fortune(161)
+detach(package:fortunes, unload=TRUE)
+```
+ 
+```{r}
+"+"(2,3)
+"-"(100,90)
+"*"(6,9)
+"/"(52,5)
+
+"+"(9,8)
+
+S <- letters[1:5]
+n <- length(S)
+r <- 3
+result <- t(combn(S,r))
+result
+
+apply(result,1,function(x) paste0(x,collapse="")) # just return as a vector of strings
+```
+
+Combinatorics style 5C2
+```{r}
+
+
+choose(5,0)
+## [1] 1
+choose(5,1)
+## [1] 5
+choose(5,2)
+## [1] 10
+choose(5,3)
+## [1] 10
+choose(5,4)
+## [1] 5
+choose(5,5)
+## [1] 1
+```
+Some recursive relations:
+
+C(n,r)=C(n,n−r)
+
+C(n,l)C(l,r)=C(n−1,r)C(n−1,r−1)
+
+∑nk=0C(n,k)=2n
+
+C(m+n,r)=C(m,0)C(n,r)+C(m,1)C(n,r−1)+…C(m,r)C(n,0)
+
+If repetition is allowed, there are C(n+r−1,r) possibilities
+
+If adjacent objects cannot be close together, then there are C(n−r+1,r) possibilities
+
+Combinations, among many other things, give the coefficients for the binomial expression:
+
+(a+b)n=∑i=0nC(n,i)an−ibi
+
+and thus combinations give us Pascal Triangle:
+
+```{r}
+pascal <- matrix(rep(NA,100),ncol=10)
+for(i in 0:10)
+  for(j in 0:i)
+    pascal[i,j] <- choose(i,j)
+print(pascal, na.print=" " )
+```
+Permutations
+To make the same but where the order is relevant, ie, a permutation (if m is equal to the length of S we get all possible arrangements):
+
+```{r}
+result <- as.matrix(expand.grid(lapply(numeric(r), function(x) S)), ncol=r)
+apply(result,1,function(x) paste0(x,collapse="")) 
+```
+Results of Infinite, NaN, and Missing Values
+Function Inf –Inf NaN NA
+is.finite() FALSE FALSE FALSE FALSE
+is.infinite() TRUE TRUE FALSE FALSE
+is.nan() FALSE FALSE TRUE FALSE
+is.na() FALSE FALSE TRUE TRUE
+
+```{r}
+is.infinite(10^(305:310))
+ 
+is.infinite(10^(1:310))
+u=seq(from=0, to=10, by= 0.5)
+rev(u)
+rep(2,times=9)
+rep(2, each=5)
+rep(2,2)
+```
+
+
+```{r}
+rbind(c(2,3),c(4,5))
+a[,1]= c(99,98,97)
+a[,1] <- c(99,98,97)
+
+t=rbind(c(2,5),c(8,9))
+eigen(t)$values  #eigen values
+eigen(t)$vectors  #eigen vectors
+rank(t)
+svd(t)$d
+det(t)
+solve(t)
+ginv(t)
+
+## Saving a file
+#write(f,file="data.txt")
+```
+
+
+```{r}
+library("plot3D")
+data(iris)
+head(iris)
+# x, y and z coordinates
+x <- sep.l <- iris$Sepal.Length
+y <- pet.l <- iris$Petal.Length
+z <- sep.w <- iris$Sepal.Width
+
+scatter3D(x, y, z, clab = c("Sepal", "Width (cm)"))
+```
+
+
+```{r}
+# grey background with white grid lines
+scatter3D(x, y, z, bty = "g", colkey = FALSE, main ="bty= 'g'")
+# User defined
+scatter3D(x, y, z, pch = 18, bty = "u", colkey = FALSE, 
+   main ="bty= 'u'", col.panel ="steelblue", expand =0.4, 
+   col.grid = "darkblue")
+```
+ 
+```{r}
+# gg.col: ggplot2 like color
+scatter3D(x, y, z, bty = "g", pch = 18, col = gg.col(100))
+# ramp.col: custom palettes
+scatter3D(x, y, z, bty = "g", pch = 18,
+          col = ramp.col(c("blue", "yellow", "red")) )
+```
+
+
+```{r}
+scatter3D(x, y, z, bty = "g", pch = 18, 
+          col.var = as.integer(iris$Species), 
+          col = c("#1B9E77", "#D95F02", "#7570B3"),
+          pch = 18, ticktype = "detailed",
+          colkey = list(at = c(2, 3, 4), side = 1, 
+          addlines = TRUE, length = 0.5, width = 0.5,
+          labels = c("setosa", "versicolor", "virginica")) )
+```
+
+
+```{r}
+# Bottom colkey
+scatter3D(x, y, z, bty = "g",
+          colkey = list(side = 1, length = 0.5))
+```
+ 
+```{r}
+scatter3D(x, y, z, pch = 18,  theta = 20, phi = 20,
+          main = "Iris data", xlab = "Sepal.Length",
+          ylab ="Petal.Length", zlab = "Sepal.Width")
+```
+
+
+```{r}
+scatter3D(x, y, z, phi = 0, bty = "g",
+        pch = 20, cex = 2, ticktype = "detailed")
+```
+
+
+```{r}
+# Create a scatter plot
+ scatter3D(x, y, z, phi = 0, bty = "g",
+        pch = 20, cex = 2, ticktype = "detailed")
+# Add another point (black color)
+scatter3D(x = 7, y = 3, z = 3.5, add = TRUE, colkey = FALSE, 
+         pch = 18, cex = 3, col = "black")
+```
+
+
+```{r}
+# Create a scatter plot
+ scatter3D(x, y, z, phi = 0, bty = "g", pch = 20, cex = 0.5)
+# Add text
+text3D(x, y, z,  labels = rownames(iris),
+        add = TRUE, colkey = FALSE, cex = 0.5)
+```
+
+
+```{r}
+# type ="h" for vertical lines
+scatter3D(x, y, z, phi = 0, bty = "g",  type = "h", 
+           ticktype = "detailed", pch = 19, cex = 0.5)
+```
+
+
+```{r}
+x0 <- c(0, 0, 0, 0)
+y0 <- c(0, 0, 0, 0)
+z0 <- c(0, 0, 0, 0)
+x1 <- c(0.89, -0.46, 0.99, 0.96)
+y1 <- c(0.36,  0.88, 0.02, 0.06)
+z1 <- c(-0.28, 0.09, 0.05, 0.24)
+cols <- c("#1B9E77", "#D95F02", "#7570B3", "#E7298A")
+
+arrows3D(x0, y0, z0, x1, y1, z1, colvar = x1^2, col = cols,
+         lwd = 2, d = 3, clab = c("Quality", "score"), 
+         main = "Arrows 3D", bty ="g", ticktype = "detailed")
+# Add starting point of arrow
+points3D(x0, y0, z0, add = TRUE, col="darkred", 
+          colkey = FALSE, pch = 19, cex = 1)
+# Add labels to the arrows
+text3D(x1, y1, z1, c("Sepal.L", "Sepal.W", "Petal.L", "Petal.W"),
+       colvar = x1^2, col = cols, add=TRUE, colkey = FALSE)
+
+
+rect3D(x0 = 0, y0 = 0.5, z0 = 0, x1 = 1, z1 = 5, 
+       ylim = c(0, 1), bty = "g", facets = TRUE, 
+       border = "red", col ="#7570B3", alpha=0.5,
+       lwd = 2, phi = 20)
+
+```
+```{r}
+# Library
+library(plotly)
+
+# Data: volcano is provided by plotly
+
+# Plot
+p <- plot_ly(z = volcano, type = "surface")
+p 
+
+# save the widget
+# library(htmlwidgets)
+# saveWidget(p, file=paste0( getwd(), "/HtmlWidget/3dSurface.html"))
+```
+
+
+```{r}
+# Library rgl
+library(rgl)
+
+#Choose the size of the image on the output (800,650 to have 800 x 600)
+r3dDefaults$windowRect <- c(0,50, 800, 650) 
+open3d()
+
+#If you want to put line on the background
+#bg3d(sphere = TRUE, color = c("grey", "white"), lit = TRUE, back = "lines" ,lwd=2)
+
+# This is to output a rgl plot in a rmarkdown document. Note that you must add webgl=TRUE, results='hide' in the chunck header
+library(knitr)
+knit_hooks$set(webgl = hook_webgl)
+
+
+# plot
+bg3d( col=rgb(0.2,0.8,0.5,0.8) )
+theta <- seq(0, 2*pi, len = 50)
+knot <- cylinder3d(
+center = cbind(sin(theta) + 3*sin(2*theta), 2*sin(3*theta), cos(theta) - 2*cos(2*theta)),
+e1 = cbind(cos(theta) + 4*cos(2*theta),6*cos(3*theta),sin(theta) + 4*sin(2*theta)),radius = 0.9,closed = TRUE)
+shade3d(addNormals(subdivision3d(knot, depth = 2)), col = rgb(0.4,0.2,0.8,0.3))
+
+# save it as png
+# rgl.snapshot( "~/Desktop/#20_portfolio_knot_3D.png", fmt="png", top=TRUE  )
+
+
+# Export as an html file if needed:
+writeWebGL( filename="HtmlWidget/3dknot.html" ,  width=600, height=600)
+```
+
+
+```{r}
+moxbuller = function(n) {   
+    u = runif(n)   
+    v = runif(n)   
+    x = cos(2*pi*u)*sqrt(-2*log(v))  
+    y = sin(2*pi*v)*sqrt(-2*log(u))
+    r = list(x=x, y=y)
+    return(r) 
+}
+r = moxbuller(50000) 
+par(bg="black") 
+par(mar=c(0,0,0,0)) 
+plot(r$x,r$y, pch=".", col="blue", cex=1.2)
+```
+
+
+
+
+
+```{r}
+library(rgl)
+plot3d(mtcars$mpg,mtcars$wt,mtcars$disp, col="red", size=3)
+
+```
+
+
+```{r}
+library("rgl")
+open3d(windowRect=c(50,50,800,800))
+
+x = seq(-10, 10, length=20)
+y = seq(-10, 10, length=20)
+z = outer(x,y, function(x,y) dnorm(x, 2, 3)*dnorm(y, 3, 7))
+
+palette = colorRampPalette(c("blue", "green", "yellow", "red")) 
+col.table = palette(256)
+col.ind = cut(z, 256)
+persp3d(x, y, z, col=col.table[col.ind])
+```
+
+
+```{r}
+library(MASS)
+# from the fitdistr example
+set.seed(123)
+x <- rgamma(100, shape = 5, rate = 0.1)
+fit <- fitdistr(x, dgamma, list(shape = 1, rate = 0.1), lower = 0.001)
+loglik <- function(shape, rate) sum(dgamma(x, shape=shape, rate=rate, 
+                                           log=TRUE))
+loglik <- Vectorize(loglik)
+xlim <- fit$estimate[1]+4*fit$sd[1]*c(-1,1)
+ylim <- fit$estimate[2]+4*fit$sd[2]*c(-1,1)
+
+mfrow3d(1, 2, sharedMouse = TRUE)
+persp3d(loglik, 
+        xlim = xlim, ylim = ylim,
+        n = 30)
+zlim <- fit$loglik + c(-qchisq(0.99, 2)/2, 0)
+next3d()
+persp3d(loglik, 
+        xlim = xlim, ylim = ylim, zlim = zlim,
+        n = 30)
+
+```
+
+
+```{r}
+with(iris, plot3d(Sepal.Length, Sepal.Width, Petal.Length, 
+                  type="s", col=as.numeric(Species)))
+
+```
+
+```{r}
+open3d()
+cols <- rainbow(7)
+layout3d(matrix(1:16, 4,4), heights=c(1,3,1,3))
+text3d(0,0,0,"tetrahedron3d"); next3d()
+shade3d(tetrahedron3d(col=cols[1])); next3d()
+text3d(0,0,0,"cube3d"); next3d()
+shade3d(cube3d(col=cols[2])); next3d()
+text3d(0,0,0,"octahedron3d"); next3d()
+shade3d(octahedron3d(col=cols[3])); next3d()
+text3d(0,0,0,"dodecahedron3d"); next3d()
+shade3d(dodecahedron3d(col=cols[4])); next3d()
+text3d(0,0,0,"icosahedron3d"); next3d()
+shade3d(icosahedron3d(col=cols[5])); next3d()
+text3d(0,0,0,"cuboctahedron3d"); next3d()
+shade3d(cuboctahedron3d(col=cols[6])); next3d()
+text3d(0,0,0,"oh3d"); next3d()
+shade3d(oh3d(col=cols[7]))
+```
+
+
+```{r}
+library(rgl);
+
+open3d(windowRect=c(34, 57, 727, 707));
+
+plot3d(
+ # ----------------------------------------
+   function(x, y) {
+     ( ((x+1.1*y)^2) + (3*(y+0.09)^2) ) * exp(-(x^2)-(y^2 ))
+   },
+ # ----------------------------------------
+   col    = colorRampPalette(c('#4499ff', '#ee9933')),
+   xlab   = 'x',
+   ylab   = 'y',
+   zlab   = 'f(x,y)',
+   xlim   = c(-3, 3),
+   ylim   = c(-3, 3),
+   aspect = c(1, 1, 0.5)
+);
+
+#
+# After rotating the plot with the mouse,
+# the matrix data can be determined with:
+#
+#   par3d()$userMatrix
+#
+view3d(
+  userMatrix = matrix(
+     c(
+        0.8091025 ,  0.5799688 , -0.09481177 , 0,
+       -0.1589791 ,  0.3713353 ,  0.91478717 , 0,
+        0.5657551 , -0.7250838 ,  0.39265123 , 0,
+        0.0000000 ,  0.0000000 ,  0.00000000 , 1
+      ),
+      nrow = 4,
+      byrow = TRUE
+    )
+)
+```
+
+
+```{r}
+library(rgl)
+
+open3d()
+plot3d(cube3d(col="red"));
+
+M <- par3d("userMatrix")
+
+play3d(
+  par3dinterp(
+     userMatrix=list(M, rotate3d(M, pi/2, 1, 0, 0),
+                        rotate3d(M, pi/2, 0, 1, 0) )
+  ),
+  duration=40
+)
+```
+ 
+```{r}
+
+library(rgl)
+
+open3d();
+plot3d(cube3d(col="green"));
+
+M <- par3d("userMatrix")
+
+movie3d(
+  par3dinterp(
+     userMatrix=list(M, rotate3d(M, pi/2, 1, 0, 0),
+                        rotate3d(M, pi/2, 0, 1, 0) )
+  ),
+  dir     = '.',
+  clean   = FALSE,
+  duration= 4
+)
+```
+ 
+```{r}
+library(rgl)
+
+open3d()
+
+a  <- seq(0, 4*pi, length=100)
+
+x <- sin(a)
+y <- cos(a)
+z <- a / max(a)
+
+plot3d(x, y, z)
+```
+
+Create a new table by recoding
+```{r}
+library(tidyverse)
+sw =starwars %>% #and then....
+  select(name,height,mass, gender)%>% #and then....
+  rename(weight=mass)%>% #and then....
+  na.omit()%>% #and then....
+  mutate(height=height/100)%>% #and then....
+  filter(gender  %in% c("male","female"))%>% #and then....
+  mutate(gender = recode(gender,
+                         male="m",
+                         female="f"))%>% #and then....
+  
+  mutate(size= height > 1 & weight > 75,
+         size = if_else(size== TRUE, "big", "small"))
+  
+
+
+
+
+sw
+
+
+
+```
+
+
+```{r}
+library(tidyverse)
+view(msleep)
+my_data = msleep%>% #and then....
+  select(name,sleep_total)%>% #and then....
+  filter(!sleep_total >  18)
+
+my_data
+```
+
+
+```{r}
+
+my_data = msleep%>% #and then....
+  select(name,order,bodywt,sleep_total)%>% #and then....
+  filter(order == "Primates", bodywt > 20) #to view the opposite we can add the negation sign !
+
+my_data
+```
+
+
+```{r}
+my_data = msleep%>% #and then....
+  select(name,sleep_total)%>% #and then....
+  filter(name == "Cow"|
+           name== "Dog"|
+           name== "Goat") #to view the opposite we can add the negation sign !
+
+my_data
+```
+ Another way of doing the example above
+```{r}
+my_data = msleep%>% #and then....
+  select(name,sleep_total)%>% #and then....
+  filter(name %in% c("Cow","Dog","Goat")) #to view the opposite we can add the negation sign !
+
+my_data
+```
+
+
+```{r}
+my_data = msleep  %>% #and then....
+  select(name,sleep_total)%>% #and then....
+  filter(between(sleep_total,16,18))
+
+my_data
+```
+
+
+
+```{r}
+my_data = msleep  %>% #and then....
+  select(name,sleep_total)%>% #and then....
+  filter(near(sleep_total,17,tol = 0.5))
+
+my_data
+```
+ Filters everything that includes NA
+```{r}
+my_data = msleep  %>% #and then....
+  select(name,conservation,sleep_total)%>% #and then....
+  filter(is.na(conservation))
+
+my_data
+```
+Filters everything that excludes NA
+```{r}
+my_data = msleep  %>% #and then....
+  select(name,conservation,sleep_total)%>% #and then....
+  filter(!is.na(conservation))
+
+my_data
+```
+```{r}
+library(leaflet)
+leaflet() %>%
+  setView(174.764, -36.877, zoom = 16) %>% 
+  addTiles() %>%
+```
+
+
+```{r}
+addMarkers(174.764, -36.877, popup = "Maungawhau") 
+```
+ 
+ 
+```{r}
+library(shiny)
+
+textInput("name", "What is your name?")
+numericInput("age", "How old are you?", NA, min = 0, max = 150)
+```
+
+```{r}
+library(sp)  # classes for spatial data
+library(raster)  # grids, rasters
+library(rasterVis)  # raster visualisation
+library(maptools)
+library(rgeos)
+# and their dependencies
+library(dismo)
+
+mymap <- gmap("Spain")  # choose whatever country
+plot(mymap)
+```
+
+
+```{r}
+library(leaflet)
+popup = c("Robin", "Jakub", "Jannes")
+leaflet() %>%
+  addProviderTiles("NASAGIBS.ViirsEarthAtNight2012") %>%
+  addMarkers(lng = c(-3, 23, 11),
+             lat = c(52, 53, 49), 
+             popup = popup)
+
+```
+
+
+```{r}
+library (ggplot2)
+titanic = read.csv("titanic.csv", stringsAsFactors = FALSE)
+View(titanic)
+
+# set up factors.
+titanic$Pclass = as.factor(titanic$Pclass)
+titanic$Survived = as.factor(titanic$Survived)
+titanic$Sex = as.factor(titanic$Sex )
+titanic$Embarked = as.factor(titanic$Embarked )
+
+
+ggplot(titanic,aes(x = Survived)) + geom_bar()
+ geom_bar()
+
+prop.table(table(titanic$Survived))  #Compares who perished and who survived
+
+
+
+
+
+```
+
+
+```{r}
+#create the same plot with title
+# We can use color to look at two aspects (i.e dimmensions)
+ggplot(titanic,aes(x = Sex, fill = Survived))+
+ theme_bw() +
+ geom_bar() +
+ labs(y = "Passenger Count",
+      title = "Titanic Survival Rates by Sex")
+```
+
+
+```{r}
+# What was the survival rate bty calss of tickets
+ggplot(titanic,aes(x = Pclass, fill = Survived))+
+ theme_bw() +
+ geom_bar() +
+ labs(y = "Passenger Count",
+      title = "Titanic Survival Rates by P-Class")
+
+
+
+```
+
+
+```{r}
+# 4 What was the survival Rates by class of ticket and gender?
+
+ggplot(titanic,aes(x = Sex, fill = Survived))+
+ theme_bw() +
+  facet_wrap(~Pclass)+
+ geom_bar() +
+ labs(y = "Passenger Count",
+      title = "Titanic Survival Rates by P-Class and sex")
+```
+
+
+```{r}
+# 5th What os the distribution of passenger ages?
+
+ggplot(titanic,aes(x = Age)) +
+  theme_bw() +
+  geom_histogram(binwidth = 5) +
+ labs(y = "Passenger Count",
+      x = "age (binwidth = 5)",
+      title = "Titanic Age Distribution")
+
+
+
+
+
+
+```
+
+
+```{r}
+# 6th question  - What are the survival rates by age?
+
+ggplot(titanic,aes(x = Age, fill = Survived)) +
+  theme_bw() +
+  geom_histogram(binwidth = 5) +
+ labs(y = "Passenger Count",
+      x = "age (binwidth = 5)",
+      title = "Titanic Age Distribution")
+```
+
+
+```{r}
+#boxplot is another way of visualization
+
+ggplot(titanic,aes(x = Survived, y = Age)) +
+  theme_bw() +
+  geom_boxplot()+
+ labs(x = "Age",
+      y = "Survived",
+      title = "Titanic Age Distribution")
+
+
+```
+
+
+```{r}
+#use Facets for density plots
+ggplot(titanic,aes(x = Age, fill = Survived )) +
+  theme_bw() +
+  facet_wrap(Sex ~ Pclass) +
+  geom_density(alpha = 0.5) +
+ labs(x = "Age",
+      y = "Survived",
+      title = "Titanic Age Distribution")
+```
+
+
+```{r}
+# you can tell the same story with a Histogram
+ggplot(titanic,aes(x = Age, fill = Survived )) +
+  theme_bw() +
+  facet_wrap(Sex ~ Pclass) +
+  geom_histogram(binwidth = 5) +
+ labs(x = "Age",
+      y = "Survived",
+      title = "Titanic Age Distribution")
+```
+
+
+```{r}
+#Here are your USF IDs, please keep a record of them
+
+#NetID: joelrodriguez
+
+#USF ID number: U73272359
+
+#Please be patient, it may take up to an hour for your account to be activated
+
+#Setup your Emergency notification
+
+
+```
+
+```{r}
+foo<- matrix(runif(30),20)
+hc <- hclust(dist(foo), method="complete")
+plot(as.dendrogram(hc),horiz=T)
+par(new=TRUE)
+heatmap(as.matrix(foo), col=heat.colors(5))
+```
+
+ 
+```{r}
+plot(sin(seq(from=-2*pi, to = 2*pi , by = pi/10)),col="blue",pch=21, xlab="X", type="l", ylab = "Y", main=
+    "The Sine fuction graphed")
+par(new=TRUE)
+plot(cos(seq(from=-2*pi, to = 2*pi , by = pi/10)),col="red",pch=21, xlab="X", ylab = "Y", type="l")
+abline(v=20,h=0)
+abline(h=0)
+```
+ 
+```{r}
+library(caTools)             # external package providing write.gif function
+jet.colors <- colorRampPalette(c("red", "blue", "#007FFF", "cyan", "#7FFF7F",
+                                 "yellow", "#FF7F00", "red", "#7F0000"))
+dx <- 1500                    # define width
+dy <- 1400                    # define height
+C  <- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))
+C <- matrix(C, dy, dx)       # reshape as square matrix of complex numbers
+Z <- 0                       # initialize Z to zero
+X <- array(0, c(dy, dx, 20)) # initialize output 3D array
+for (k in 1:20) {            # loop with 20 iterations
+  Z <- Z^2 + C               # the central difference equation
+  X[, , k] <- exp(-abs(Z))   # capture results
+}
+write.gif(X, "Mandelbrot.gif", col = jet.colors, delay = 100)
+```
+ 
+```{r}
+
+library(shiny)
+
+shinyApp(
+  ui = fluidPage(textInput("text", "Please input text:"),
+                 DT::dataTableOutput('tbl')),
+
+  server = function(session, input, output) {
+
+    # all your choices for the textfield go into "text" column
+    allData <- data.frame(ID = '', text = c(paste0("Text",1:50)))
+
+    # table with only the texts that contain input$text
+    output$tbl = DT::renderDataTable(
+      allData[grep(input$text, allData$text), ],
+      selection = 'none',
+      rownames = FALSE,
+      options = list(searchHighlight=T)
+    )
+
+    # fill textInput after Click in Table
+    observeEvent(input$tbl_cell_clicked, {
+      info <- input$tbl_cell_clicked
+
+      if (is.null(info$value) || info$col != 1) return()
+      else {
+       updateTextInput(session, "text", value = info$value)
+      }
+    })
+  }
+)
+```
+```{r}
+
+n1 = as.numeric(readline(prompt="Enter first integer: "))
+n2 = as.numeric(readline(prompt="Enter last integer: "))
+n3 = as.numeric(readline(prompt="in steps of : "))
+
+#redline(prompt="which function would you like to graph with your chosen bounds:
+        
+
+
+
+plot(cos(seq(from=n1, 
+             to = n2, 
+             by=n3)), 
+     main = "Your function",
+     xlab="X", ylab="y",
+     col="red",
+     pch=19)
+abline(h=0,v=0)
+abline(h=0,v=25)
+
+
+
+
+
+```
+
+```{r}
+ plot(sin(seq(from=-2*pi, 
+              to=2*pi, 
+              by=pi/10)),
+      col="red", 
+      pch=19,
+      main="sinusoidal wave ", 
+      xlab = "X ",
+      ylab="Y")
+abline(h=0,v=0)
+abline(h=0,v=20)
+   
+
+```
+ 
+```{r}
+attach(mtcars)
+boxplot(mpg~cyl, 
+        xlab="Cylinders", ylab="Miles/(US) gallon", 
+        col=topo.colors(3))
+   
+legend("bottomleft", inset=.02, title="Number of Cylinders",
+   c("4","6","8"), fill=topo.colors(3), horiz=TRUE, cex=0.8)
+```
+ 
+```{r}
+library(pastecs)
+hs0<-read.table("https://stats.idre.ucla.edu/stat/data/hs0.csv", sep=",", header=T)
+head(hs0)
+
+attach(hs0)
+scores=cbind(read,write,math,science, socst)
+stat.desc(scores)
+options(scipen=100)
+options(digits=2)
+stat.desc(scores)
+hist(read)
+hist(write)
+hist(math)
+hist(science)
+hist(socst)
+boxplot(hs0$math)
+
+```
+ 
+```{r}
+stat.desc(scores, basic=F)
+```
+ 
+```{r}
+stat.desc(scores, desc=F)
+
+```
+ 
+```{r}
+bxp1 <- boxplot(hs0$math, horizontal=TRUE, axes=TRUE)
+mtext(c("Min","Max"), side=3, at=bxp1$stats[c(1,5)], line=-3,main="asd")
+```
+ 
+```{r}
+library(ggplot2)
+library(grid)
+
+scale_Values <- function(values, vFloor, vCeil) {
+  vMin = min(values)
+  vMax = max(values)
+  vFloor + vCeil * (values - vMin) / (vMax - vMin)
+}
+
+myBoxesGrob <- function(x, y, width, height, fill, alpha) {
+  scaledWidth <- scale_Values(width, 0.005, 0.1)
+  scaledHeight <- scale_Values(height, 0.005, 0.1)
+  gp = gpar(fill = fill, alpha = alpha)
+  rectGrob(x, y, scaledWidth, scaledHeight, gp = gp)
+}
+
+boxes_DrawPanel <- function(data, panel_scales, coord, na.rm = FALSE) {
+  coords <- coord$transform(data, panel_scales)
+  ggplot2:::ggname("geom_boxes", 
+      myBoxesGrob(coords$x, coords$y, coords$width, coords$height, coords$fill, coords$alpha))
+}
+
+geom_boxes <- function(mapping = NULL, data = NULL, stat = "identity", 
+                        position = "identity", na.rm = FALSE, show.legend = NA, 
+                        inherit.aes = TRUE, ...) {
+  layer(
+    data = data, 
+    mapping = mapping, 
+    stat = stat, 
+    geom = gBoxes, 
+    position = position, 
+    show.legend = show.legend, 
+    inherit.aes = inherit.aes, 
+    params = list(na.rm = na.rm, ...)
+  )
+}
+
+gBoxes <- ggproto( "gBoxes", 
+                    Geom, 
+                    draw_panel = boxes_DrawPanel, 
+                    non_missing_aes = c("x", "y", "width", "height"),
+                    default_aes = aes(fill = "lightgreen", alpha = "0.5", size = 1),
+                    icon = function(.) {}, 
+                    desc_params = list(), 
+                    seealso = list(), 
+                    examples = function(.) {})
+
+dc <- mtcars[,c("wt", "mpg", "drat", "qsec", "carb", "cyl")]
+
+ggplot(dc, aes(x=wt, y=mpg, width=drat, height=qsec)) +
+  geom_boxes(aes(alpha = carb, fill = cyl))
+```
+```{r}
+set.seed(50)
+mydf <- data.frame(a = rep(1:2, each = 10), b = rep(1:4, times = 5), c = rnorm(20), 
+    d = rnorm(20), e = sample(1:20, 20, FALSE))
+head(mydf)
+
+```
+ 
+```{r}
+
+library(ggplot2)
+library(grid)
+
+tGrob <- function(xc, yc, size, angle, fill = "darkgreen", alpha = 0.2) {
+  sinA = sin(angle)
+  cosA = cos(angle)
+  dx = c( -size/2, 0, size/2)
+  dy = c( -size/2, size/2, -size/2)
+  gl <- gList(
+    polygonGrob(x = xc + (dx*cosA - dy*sinA), y = yc + (dx*sinA + dy*cosA), 
+                gp = gpar(fill = fill, alpha = alpha, col = 0))
+  )
+  gl
+}
+
+tpsGrob <- function(x, y, size, angle, fill, alpha) {
+  sizeMax <- max(size)
+  sizeMin <- min(size)
+  scaledSize <- 0.005 + 0.1 * (size - sizeMin) / (sizeMax - sizeMin)  
+  listOfGrobs <- mapply(
+    function(xc, yc, size, angle, fill, alpha) {
+     tGrob(xc, yc, size, angle, fill, alpha)
+    }, x, y, scaledSize, angle, fill, alpha)
+  class(listOfGrobs) <- "gList"
+  gt <- gTree(name = "triangles", children = listOfGrobs, gp = NULL)
+}
+
+triangles_DrawPanel <- function(data, panel_scales, coord, na.rm = FALSE, alpha = 0.1) {
+  coords <- coord$transform(data, panel_scales)
+  ggplot2:::ggname("geom_triangles", 
+      tpsGrob(coords$x, coords$y, coords$size, coords$angle, coords$fill, alpha)
+  )
+}
+
+gTriangles <- ggproto( 
+                "gTriangles", 
+                Geom, 
+                draw_panel = triangles_DrawPanel, 
+                non_missing_aes = c("x", "y", "size"),
+                default_aes = aes(angle = 0.0, fill = "darkgreen"),
+                icon = function(.) {}, 
+                desc_params = list(), 
+                seealso = list(), 
+                extra_params = c("na.rm", "alpha"),
+                examples = function(.) {}
+              )
+
+geom_triangles <- function(mapping = NULL, data = NULL, stat = "identity", 
+                           position = "identity", na.rm = FALSE, show.legend = NA, 
+                           inherit.aes = TRUE, alpha = 0.2) {
+  layer(
+    data = data, 
+    mapping = mapping, 
+    stat = stat, 
+    geom = gTriangles, 
+    position = position, 
+    show.legend = show.legend, 
+    inherit.aes = inherit.aes, 
+    params = list(na.rm = na.rm, alpha = alpha)
+  )
+}
+
+set.seed(123)
+
+dc <- mtcars[,c("wt", "mpg", "hp", "cyl")]
+angle <- runif(1:32) * 2.0*pi
+dc <- cbind(dc, angle)
+
+ggplot(dc, aes(wt, mpg, size=hp)) + 
+  geom_triangles( aes(angle = angle, fill = cyl), alpha = 0.4) +
+  scale_y_continuous(limits = c(0.0, 55))
+
+```
+most basic plot - mtcars, mpg vs wt with size varying with hp
+```{r}
+library(ggplot2)
+
+
+ggplot( data = mtcars, aes(wt, mpg, size=hp)) +
+  geom_point()
+
+
+ggplot( data = mtcars, aes(wt, mpg, col = cyl, size=hp)) +
+  geom_point()
+```
+
+slightly fancier plot - mtcars, mpg vs wt with size varying with hp, color = cylinder
+even slightly fancier plot - mtcars, mpg vs wt with size varying with hp, color = cylinder
+with an overridden aesthetic to set the 
+```{r}
+
+ggplot( data = mtcars, aes(wt, mpg, col = cyl, size=hp)) +
+  geom_point(alpha = 0.4)
+
+ggplot( data = mtcars, aes(wt, mpg, col = cyl)) +
+  geom_point() +
+  geom_line()
+
+ggplot( data = mtcars, aes(wt, mpg, col = cyl, size=hp)) +
+  geom_point() +
+  geom_line()
+
+ggplot( data = mtcars, aes(wt, mpg, col = cyl, size=hp)) +
+  geom_point() +
+  geom_line(alpha = 0.4)
+```
+Even slightly fancier plot - mtcars, mpg vs wt with size varying with hp, color = cylinder
+with an overridden aesthetic to set the 
+```{r}
+
+ggplot( data = mtcars, aes(wt, mpg, col = cyl, size=hp)) +
+  geom_point() +
+  geom_line(alpha = 0.4, size = 0.5)
+
+ggplot( data = mtcars, aes(wt, mpg, col = cyl, size=hp)) +
+  geom_point() +
+  geom_line(aes(alpha=cyl), size = 0.5)
+```
+```{r}
+
+p <- seq(0,20,length=100)
+plot(sin(15*p),
+     col="red",
+     type="l",
+     xlab="x",
+     ylab = "y",
+     main = "Sinusoidal wave",
+     
+     
+)
+```
+
+
+```{r}
+# function for creating sine wave
+waves <- function(time_in, alpha = 0, beta = 1, freq = 24, phi = 0){
+
+  # timestep per hour
+  time_step <- 60 / unique(diff(time_in))
+  
+  # set phi as difference in hours from start of time_in
+  phi  <- min(time_in) + phi * 3600
+  phi<- as.numeric(difftime(phi, min(time_in)))
+  phi <- phi / time_step
+  
+  # get input values to cos func
+  in_vals <- seq(0, length(time_in), length = length(time_in))
+  in_vals <- in_vals / time_step
+  in_vals <- 2 * pi * in_vals * 1 / freq
+
+  # wave
+  y <- alpha + beta * sin(in_vals + phi)
+	
+	return(y)
+	
+}
+
+
+# input time series for two weeks, 15 minute time step
+x <- as.POSIXct(c('2017-04-01', '2017-04-15'))
+x <- seq(x[1], x[2], by = 60 * 15)
+
+# get three sine waves
+# a: default
+# b: amplitude 0.5, 48 hour period
+# c: amplitude 2, 12 hour period
+a <- waves(x)
+b <- waves(x, beta = 0.5, f = 48)
+c <- waves(x, beta = 2, f = 12)
+
+# for data munging and plotting
+library(tidyverse)
+
+# get sum of all y values, combine to single object
+yall <- rowSums(cbind(a, b, c))
+dat <- data.frame(x, a, b, c, yall) %>% 
+  gather('var', 'val', -x)
+
+# plot
+ggplot(dat, aes(x = x, y = val)) + 
+  geom_line() + 
+  facet_wrap(~var, ncol = 1) + 
+  theme_bw()
+
+library(SWMPr)
+library(oce)
+
+# clean, one hour time step, subset, fill gaps
+dat <- qaqc(apadbwq) %>% 
+  setstep(timestep = 60) %>% 
+  subset(subset = c('2013-01-01 0:0', '2013-12-31 0:0'), select = 'depth') %>% 
+  na.approx(maxgap = 1e6)
+datsl <- as.sealevel(elevation = dat$depth, time = dat$datetimestamp)
+plot(datsl)
+
+```
+ 
+```{r}
+# tidal components to estimate
+constituents <- c('M2', 'S2', 'N2', 'K2', 'K1', 'O1', 'P1')
+
+# loop through tidal components, predict each with tidem
+preds <- sapply(constituents, function(x){
+  
+    mod <- tidem(t = datsl, constituent = x)
+    pred <- predict(mod)
+    pred - mean(pred)
+    
+  }) 
+
+# combine prediction, sum, add time data
+predall <- rowSums(preds) + mean(datsl[['elevation']])
+preds <- data.frame(time = datsl[['time']], preds, Estimated = predall) 
+
+head(preds)
+
+# prep for plot
+toplo <- preds %>% 
+  gather('component', 'estimate', -time) %>% 
+  mutate(component = factor(component, level = c('Estimated', constituents)))
+
+# plot two weeks
+ggplot(toplo, aes(x = time, y = estimate, group = component)) + 
+  geom_line() + 
+  scale_x_datetime(limits = as.POSIXct(c('2013-07-01', '2013-07-31'))) + 
+  facet_wrap(~component, ncol = 1, scales = 'free_y') + 
+  theme_bw() 
+
+# estimate all components together
+mod <- tidem(t = datsl)
+
+# get components of interest
+amps <- data.frame(mod@data[c('name', 'amplitude')]) %>% 
+  filter(name %in% constituents) %>% 
+  arrange(amplitude)
+amps
+
+```
+
+```{r}
+# add predictions to observed data
+dat$Estimated <- predict(mod)
+
+# plot one month
+ggplot(dat, aes(x = datetimestamp, y = depth)) + 
+  geom_point() + 
+  geom_line(aes(y = Estimated), colour = 'blue') + 
+  scale_x_datetime(limits = as.POSIXct(c('2013-07-01', '2013-07-31'))) + 
+  scale_y_continuous(limits = c(0.9, 2)) +
+  theme_bw() 
+
+
+
+library(SWMPr)
+library(oce)
+
+# clean input data, one hour time step, subset, fill gaps
+dat <- qaqc(apadbwq) %>% 
+  setstep(timestep = 60) %>% 
+  subset(., subset = c('2013-01-01 0:0', '2013-12-31 0:0'), select = 'depth') %>% 
+  na.approx(maxgap = 1e6)
+
+# get model
+datsl <- as.sealevel(elevation = dat$depth, time = dat$datetimestamp)
+mod <- tidem(t = datsl)
+
+# add predictions to observed data
+dat$Estimated <- predict(mod)
+
+# plot
+ggplot(dat, aes(x = datetimestamp, y = Estimated)) + 
+  geom_line() +
+  theme_bw() 
+```
+
+ 

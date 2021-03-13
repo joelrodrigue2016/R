@@ -1,0 +1,64 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Try running every cell
+
+```{r}
+library(shiny)
+library(shinydashboard)
+library(leaflet)
+library(leaflet.extras)
+library(rgdal)
+library(sp)
+library(raster)
+library(reactable)
+```
+Let's create a ui first
+```{r}
+ui <-dashboardPage(
+  dashboardHeader(title = "R Geo App"),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem(
+        "Maps",
+        tabName = "Maps",
+        icon=icon("globe"),
+        menuSubItem("Earthquake OSM", tabName = "m_osm",icon=icon("map"))
+      )
+    )
+  ),
+  dashboardBody(
+    tabItems(
+      tabItem(
+        tabName = "m_osm",
+        tags$style(type ="text/css" ,"#earthq_osm {height: calc(100vh-80px) !important;}"), 
+      leafletOutput("earthq_osm")
+      )
+      
+      )
+    )
+  )
+
+```
+
+```{r}
+server <- function(input,output,session){
+  
+  data(quakes)
+  
+  output$earthq_osm <- renderLeaflet({
+    
+    leaflet(data=quakes) %>% addTiles(group = "OpenStreetMap") %>%
+      
+      addMarkers(lng = -long, lat = -lat, popup =as.character(mag), label = -as.character(mag),group = "Markers")
+      
+    })
+}
+shinyApp(ui,server)
+```
+```{r}
+
+```
+

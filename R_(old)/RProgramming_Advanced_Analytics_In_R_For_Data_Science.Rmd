@@ -1,0 +1,384 @@
+---
+title: "R Programming: Advance Analytics in R for Data Science"
+output: html_notebook
+---
+
+About this course
+Take Your R & R Studio Skills To The Next Level. Data Analytics, Data Science, Statistical Analysis in Business, GGPlot2
+
+Data Preparation
+```{r}
+getwd()   #get the working directory
+setwd("/Users/steph/OneDrive/Documents/R Projeccts")  #setting the working directory
+getwd()   #get the working directory  (just to confirm)
+
+fin <- read.csv("P3-Future-500-The-Dataset.csv")
+fin
+head(fin) # This is used in order to visualize the first rows of data
+tail(fin)# This is used in order to visualize the last rows of data
+
+
+head(fin,10)# This is used in order to visualize the first (whatever thhe indicated number of)rows of data
+tail(fin,10)# This is used in order to visualize the last (whatever thhe indicated number of)rows of data
+summary(fin)
+```
+
+
+```{r}
+##changing from non factor to factor
+fin$id=factor(fin$ID)
+summary(fin)
+str(fin)
+
+fin$Inception=factor(fin$Inception)
+
+summary(fin)
+str(fin)
+
+```
+
+Factor variable trap (FVT)
+To the human eye these numbers may look like they are the same thing/type, but for R these are various different types
+
+Useful tips when adding columns:
+p = sum(titanic[, 'Survived'])
+p1=sum(titanic[, 'Survived'], na.rm = TRUE)  this is useful if the data contains na
+```{r}
+a <-c("12","13","14","12","12") ##These are Characters
+a##These are Characters
+typeof(a)##These are Characters
+b <-as.numeric(a)##These are double
+b##These are double
+typeof(b)##These are double
+```
+
+Factors are the data objects which are used to categorize the data and store it as levels. They can store both strings and integers. They are useful in the columns which have a limited number of unique values. Like "Male, "Female" and True, False etc. They are useful in data analysis for statistical modeling.
+
+Factors are created using the factor () function by taking a vector as input.
+```{r}
+#Converting into numerics or factor
+
+z <- factor(c("12","13","14","12","12"))##These are integers
+z##These are integers
+typeof(z)##These are integers
+
+y <- as.numeric(z)
+
+y
+y1<-c("12","13","14","12","12")
+as.numeric(z)
+as.numeric(y1)
+typeof(y)
+
+#-------------------------------
+#the best practice is a conbination of both as follows
+
+x <- as.numeric(as.character(a))
+x
+typeof(x)
+```
+More FVT
+```{r}
+head(fin)
+str(fin)
+
+
+#fin$Profit <- factor(fin$Profit)  This is dangerous
+head(fin)
+str(fin)
+summary(fin)
+#fin$Profit <- as.numeric(fin$Profit) This is dangerous
+
+
+
+```
+```{r}
+#gsub()  replaces all instances
+#sub()  replaces some instances
+?sub
+?gsup
+
+
+```
+
+escape sequence in R
+
+There are other characters in R that require escaping, and this rule applies to all string functions in R, including regular expressions:
+
+\': single quote. You don’t need to escape single quote inside a double-quoted string, so we can also use "'" in the previous example.
+\": double quote. Similarly, double quotes can be used inside a single-quoted string, i.e. '"'.
+\n: newline.
+\r: carriage return.
+\t: tab character.
+Quantifiers
+Quantifiers specify how many repetitions of the pattern.
+
+*: matches at least 0 times.
++: matches at least 1 times.
+?: matches at most 1 times.
+{n}: matches exactly n times.
+{n,}: matches at least n times.
+{n,m}: matches between n and m times.
+Run the following while taking the time to understand the logic:
+Position of pattern within the string
+^: matches the start of the string.
+$: matches the end of the string.
+\b: matches the empty string at either edge of a word. Don’t confuse it with ^ $ which marks the edge of a string.
+\B: matches the empty string provided it is not at an edge of a word.
+For the last example, \b is not a recognized escape character, so we need to double slash it \\b.
+```{r}
+#load the data
+fin <- read.csv("P3-Future-500-The-Dataset.csv")
+fin
+# target the individual areas that need converting
+fin$Expenses<-gsub("Dollars","",fin$Expenses) #do replacement
+fin$Expenses<-gsub(",","",fin$Expenses) #Always do this second replacement
+head(fin)
+str(fin)
+fin$Revenue<-gsub("\\$","",fin$Revenue)#do replacement
+fin$Revenue<-gsub(",","",fin$Revenue) #Always do this second replacement
+head(fin)
+
+fin$Growth<-gsub("%","",fin$Growth)#do replacement
+
+fin$Expenses= as.numeric(fin$Expenses)
+fin$Revenue= as.numeric(fin$Revenue)
+fin$Growth= as.numeric(fin$Growth)
+
+fin
+
+#At this point the data looks clean, but we still need to address the missing data.
+```
+Dealing with missing data.
+NA is a three value logic. meaning we do not know whether it is True or False.
+NA==NA > NA
+TRUE==NA> NA
+FALSE ==NA>NA
+TRUE==FALSE>FALSE
+FALSE==TRUE>FALSE
+ETC
+
+This is a quick way to identify NA data in a dataset
+```{r}
+#complete.cases(fin)
+
+fin[!complete.cases(fin),]
+
+
+```
+The problem with the example above is that R does not treat empty spaces as NA but just as regular data that is why when importing data, it must be done the following way:
+```{r}
+fin <- read.csv("P3-Future-500-The-Dataset.csv",na.strings = c(""))
+fin
+fin[!complete.cases(fin),]
+# target the individual areas that need converting
+fin$Expenses<-gsub("Dollars","",fin$Expenses) #do replacement
+fin$Expenses<-gsub(",","",fin$Expenses) #Always do this second replacement
+head(fin)
+str(fin)
+fin$Revenue<-gsub("\\$","",fin$Revenue)#do replacement
+fin$Revenue<-gsub(",","",fin$Revenue) #Always do this second replacement
+head(fin)
+
+fin$Growth<-gsub("%","",fin$Growth)#do replacement
+
+fin$Expenses= as.numeric(fin$Expenses)
+fin$Revenue= as.numeric(fin$Revenue)
+fin$Growth= as.numeric(fin$Growth)
+
+fin
+```
+
+
+```{r}
+fin[fin$Revenue==9746272,]  # This is the wrong way
+?which
+fin[which(fin$Revenue==9746272),]    #This is the right way
+```
+
+```{r}
+
+head(fin)
+fin[fin$Employees==45,]
+fin[which(fin$Employees==45),]
+
+fin[which(fin$Industry=="Retail"),]
+
+head(fin,24)
+```
+great function to use as well is is.na()
+```{r}
+#is.na()
+
+t = c(1,5,8,5,6,5,4,8,5,2,5,4,NA)
+is.na(t)
+fin[is.na(fin$Expenses),]
+fin[is.na(fin$State),]
+```
+
+
+```{r}
+fin_backup<-fin   #very important in orver backup previous changes
+
+fin[!complete.cases(fin),]
+fin[!is.na(fin$Industry),] #how missing data was identified.
+fin<-fin[!is.na(fin$Industry),] # This is our new data that does not contain missing data
+fin # This is our new data that does not contain missing data
+
+```
+
+```{r}
+fin
+rownames(fin)
+
+# The way it can be reset is as follows
+rownames(fin)<-NULL
+```
+
+
+```{r}
+fin[is.na(fin$State),fin$ci]
+```
+
+EXTREMELY IMPORTANT, THIS IS HOW DATA CAN BE SEPARATED BY MULTIPLE VARIABLES.
+
+```{r}
+fin[is.na(fin$State)& fin$City=="New York",]
+fin[is.na(fin$State)& fin$City=="New York","State"]
+
+#check:
+fin[c(11,377),]
+fin[!complete.cases(fin),]
+
+fin[is.na(fin$State)& fin$City=="San Francisco","State"]<-"CA"
+#check:
+fin[c(82,265),]
+
+fin[!complete.cases(fin),]
+```
+
+
+```{r}
+#Replacing missing data: Median imputation method (part 1)
+fin[!complete.cases(fin),]
+med_empl_retail=median(fin[fin$Industry=="Retail","Employees"], na.rm = TRUE)
+med_empl_retail
+
+fin[is.na(fin$Employees)&fin$Industry =="Retail","Employees"]<-med_empl_retail
+
+
+
+#check
+fin[3,]
+
+median(fin[,"Employees"],na.rm = TRUE)
+fin_serv <- median(fin[fin$Industry=="Financial Services","Employees"],na.rm=TRUE)
+fin_serv
+
+fin[330,]
+fin[!complete.cases(fin),
+]
+
+med_growth_constr <- median(fin[fin$Industry =="Construction","Growth"],na.rm = TRUE)
+med_growth_constr
+#check
+fin[8,]
+fin[!complete.cases(fin),]
+
+
+med_rev_constr <-median(fin[fin$Revenue=="construction", "Revenue"], na.rm = TRUE)
+med_rev_constr
+
+fin[is.na(fin$Revenue)&fin$Industry=="Construction",]
+fin[is.na(fin$Revenue)& fin$Industry=="Construction","Revenue"]<-med_rev_constr
+
+fin[!complete.cases(fin),]
+
+med_exp_constr<- median(fin[fin$Industry=="Construction","Expenses"],na.rm = TRUE)
+med_exp_constr
+
+fin[is.na(fin$Expenses)&fin$Industry=="Construction",]
+fin[is.na(fin$Expenses)& fin$Industry=="Construction","Expenses"]<-med_exp_constr
+
+
+fin[!complete.cases(fin),]
+```
+
+Replacing missing data: deriving values
+Revenue-Expenses = Profit
+Expenses = Revenue - Profit
+```{r}
+fin[is.na(fin$Profit),"Profit"] = fin[is.na(fin$Profit),"Revenue"]-fin[is.na(fin$Profit),"Expenses"]
+fin[c(8,42),]
+
+fin[!complete.cases(fin),]
+fin[is.na(fin$Expenses),"Expenses"] = fin[is.na(fin$Expenses),"Revenue"] -fin[is.na(fin$Expenses),"Profit"]
+fin[15,]
+fin[!complete.cases(fin),]
+```
+
+Analysis of the Data
+```{r}
+library(ggplot2)
+p<-ggplot(data=fin)
+
+p + geom_point(aes(x=Revenue,y=Expenses,
+                   color=Industry,
+                   size= Profit))
+
+```
+
+
+```{r}
+p+geom_point(aes(x=Revenue,y=Expenses,
+                 color=Industry))+
+  geom_smooth(aes(x=Revenue,y=Expenses,
+                  color=Industry))
+```
+
+
+```{r}
+d = ggplot(data=fin,aes(x=Revenue,y=Expenses,
+                        color=Industry))
+d + geom_point()+
+  geom_smooth(fill=NA,size=1.2)
+```
+
+```{r}
+f = ggplot(data=fin,aes(x = Industry,y=Growth,
+                        color = Industry
+                        ))
+
+f+geom_boxplot(size=1)
+
+#extra
+f + geom_jitter()+
+  geom_boxplot(size=1,
+               alpha=0.8,
+               outlier.color=NA)
+
+```
+
+1. Factor variable trap.
+2. Use gsub() and sub() for cleaning data.
+3. Methods for dealing with missing data.
+4. NA - is a 3rd logical constant.
+5. How to locate missing data: complete.cases().
+6. Filter techniques: which() and is.na().
+7. median Imputation Method.
+8. Factual Analysis and Deriving Values Method.
+```{r}
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+```

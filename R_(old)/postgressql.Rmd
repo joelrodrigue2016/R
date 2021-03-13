@@ -1,0 +1,84 @@
+---
+title: "Postgres SQL connection and automation"
+output: html_notebook
+---
+
+db: name will be the database you are wanting to use.
+
+host: will be the host your database is on. Either your localhost or the url to your database.
+
+port: By default the port will be 5432 for postgresql.
+
+user: will be the username for the database you are connecting to
+password will be the database password you use when connecting to postgresql Next we can list the tables that are available in our database
+
+CONNECTION SETTINGS
+There are six settings needed to make a connection:
+
+Driver - See the Drivers section for setup information.
+
+Server - A network path to the database server.
+
+Database - The name of the schema.
+
+UID - The user’s network ID or server local account.
+
+PWD - The account’s password.
+
+Port - Should be set to 5432
+
+
+Connecting to the postgres sql database
+
+```{r}
+
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+
+password = "Kingjames1611"
+DBI::dbDriver('PostgreSQL')
+drv=dbDriver("PostgreSQL")
+con=dbConnect(drv,dbname="dvdrental",
+              host="localhost",
+              port=5432,
+              user="postgres",
+              password=password)
+
+dbListTables(conn = con)
+```
+using the database
+```{r}
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+
+## Actual code for automating the database
+
+query = '(select rental_id,payment_id
+from payment,store
+)'
+
+
+#processing the query
+
+result<- RPostgreSQL::dbGetQuery(conn = con,statement = query)
+result
+```
+
+
+Keep in mind that you can also plot the information contained in the database right here in R.
+
+```{r}
+plot(result)
+summary(result)
+```
+```{r}
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+
+dbDisconnect(con)
+
+```
+

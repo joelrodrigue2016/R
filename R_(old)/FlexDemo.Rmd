@@ -1,0 +1,32 @@
+---
+title: "My Super Cool Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+
+---
+
+```{r setup, include=FALSE}
+library(DT)
+library(flexdashboard)
+library(tidyverse)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### chart A
+
+```{r}
+library(DT)
+iris2 = iris
+# only show the Copy and Print buttons
+datatable(
+  iris2,
+  extensions = 'Buttons', options = list(
+    dom = 'Bfrtip',
+    buttons = c("copy", "print","excel","csv","pdf")
+  )
+)
+
+```
+

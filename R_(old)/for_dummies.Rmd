@@ -1,0 +1,1157 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Code snippets appear like this example, where we simulate 1 million throws
+of two six‐sided dice:
+```{r}
+set.seed(42)
+throws<- 1e6
+dice<- replicate(2,
+                 sample(1:6,throws,replace = TRUE))
+table(rowSums(dice))
+```
+
+```{r}
+a = "Hello world"
+print(a)
+noquote(a)
+paste(a)
+
+```
+
+```{r}
+ baskets.of.Granny <- c(12, 4, 4, 6, 9, 3)
+sum(baskets.of.Granny)
+
+baskets.of.Geraldine <-
+ c(5, 3, 2, 2, 12, 9)
+Intro <- "It is amazing! The All Star Grannies scored
+a total of"
+Outro <- "baskets in the last six games!"
+Total.baskets <- baskets.of.Granny +
+ baskets.of.Geraldine
+Text <- paste(Intro,
+ sum(Total.baskets),
+ Outro)
+
+print(Text)
+noquote(Text)
+
+
+cat(Text) ##right way
+```
+
+x + y y added to x 2 + 3 = 5
+x – y y subtracted from x 8 – 2 = 6
+x * y x multiplied by y 3 * 2 = 6
+x / y x divided by y 10 / 5 = 2
+x ^ y x raised to the power y 2 ^ 5 = 32
+x %% y remainder of x divided by y (x mod y) 7 %% 3 = 1
+x %/% y x divided by y but rounded down
+(integer divide)
+7 %/% 3 = 2
+```{r}
+x=2
+y=3
+x+y
+x-y
+x*y
+x/y
+x^y
+x%%y
+x%/%y
+
+```
+
+
+```{r}
+"+"(x,y)
+"-"(x,y)
+"*" (x,y)
+"/" (x,y)
+"^" (x,y)
+"%%" (x,y)
+"%/%" (x,y)
+"min" (x,y)
+"max" (x,y)
+"mean" (x,y)
+"abs"(x)
+"sqrt" (x)
+"factorial" (x)
+"choose" (x,y)
+"diff"(x,y)
+"prod"(x,y)
+```
+
+
+```{r}
+
+log(x,base = y)
+log(c(1:10))
+sqrt(c(1:10))
+print(123.456,digits = 3)
+round(-123.456, digits = -2)
+ signif(-123.456, digits = 4)
+```
+
+
+```{r}
+print(pi,digits=22)
+floor(pi)
+ceiling(pi)
+trunc(pi)
+```
+
+
+```{r}
+funct<- c("is.finite()","is.infinite()","is.nan()","is.na()")
+
+inf<- c("FALSE","TRUE","FALSE","FALSE")
+neg.inf<-c("FALSE","TRUE","FALSE","FALSE")
+NAN<-c("FALSE","FALSE","TRUE","TRUE")
+na<-c("FALSE","FALSE","TRUE","TRUE")
+data.frame(funct,inf,neg.inf,NAN,na)
+
+```
+
+
+```{r}
+p<- c(1:10)
+p[2]
+p[is.na(p)]
+p[!is.na(p)]
+p[!is.na(2)]
+```
+
+x == y Returns TRUE if x exactly equals y
+x != y Returns TRUE if x differs from y
+x > y Returns TRUE if x is larger than y
+x >= y Returns TRUE if x is larger than or exactly equal to y
+x < y Returns TRUE if x is smaller than y
+x <= y Returns TRUE if x is smaller than or exactly equal to y
+x & y Returns the result of x and y
+x | y Returns the result of x or y
+! x Returns not x
+xor( x, y ) Returns the result of x xor y (x or y but not x and y)
+```{r}
+s<- letters
+S<- LETTERS
+s[1:7]
+S
+length(s)
+length(S)
+s[10]
+s[15]
+s[5]
+s[12]
+noquote(s)
+noquote(S)
+head(s,3)
+tail(S,3)
+```
+
+
+```{r}
+str(islands)
+noquote(names(islands)[1:40])
+noquote(names(islands)[12])
+b <- noquote(names(islands)[18])
+```
+
+
+```{r}
+month.days <- c(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+names(month.days)<- month.name
+month.days
+```
+
+Splitting texts
+```{r}
+pangram <- "The quick brown fox jumps over the lazy dog."
+strsplit(pangram, " ")
+
+
+
+
+```
+Splitting text
+```{r}
+txt<-"Do you have to use R on the job, but you don't know much about programming? Relax! Here's a quick and painless guide to using R for all sorts of statistical and data analysis. Through real-world examples and step-by-step exercises you'll learn how to reshape and manipulate data, perform calculations, create graphical representations, and more."
+strsplit(txt, " ")
+```
+Back to normal
+```{r}
+paste(txt,collapse = " ")
+```
+```{r}
+sort(letters,decreasing = TRUE)
+
+state.name
+substr(state.name,start = 1,stop = 6)
+```
+```{r}
+gsub("cheap", "sheep's", "A wolf in cheap clothing.")
+
+x <- c("file_a.csv", "file_b.csv", "file_c.csv")
+y <- gsub("file_", "", x)
+y
+gsub("\\.csv", "", y)
+```
+
+
+```{r}
+directions <- c("North", "East", "South", "South")
+factor(directions,
+       levels = c("North", "East", "South", "West"),
+       labels = c("N", "E", "S", "W"))
+```
+
+%H Hours as a decimal number (00–23)
+%I Hours as a decimal number (01–12)
+%M Minutes as a decimal number (00–59)
+%S Seconds as a decimal number (00–61)
+%p AM/PM indicator
+```{r}
+apollo <- "July 20, 1969, 20:17:39"
+apollo.fmt <- "%B %d, %Y, %H:%M:%S"
+xct <- as.POSIXct(apollo, format = apollo.fmt, tz = "UTC")
+xct
+noquote("__________informal way__________")
+
+format(xct, "%M minutes past %I %p, on %d %B %Y")
+
+
+#There is an important difference between Date objects and POSIXct or
+#POSIXlt objects. If you use a Date object, you add and subtract days; with
+#POSIXct and POSIXlt, the operations add or subtract only seconds.
+```
+```{r}
+matrix(c(1:12),ncol = 4,nrow = 3)
+
+noquote("////////////////////////////////")
+matrix(c(1:12),ncol = 4,byrow = TRUE)
+
+```
+
+```{r}
+a<- c(1:9)
+b<-c(10:18)
+
+rbind(a,b)
+
+```
+
+```{r}
+baskets.of.Granny <- c(12, 4, 5, 6, 9, 3)
+baskets.of.Geraldine <- c(5, 4, 2, 4, 12, 9)
+baskets.team <- rbind(baskets.of.Granny, baskets.of.Geraldine)
+baskets.team
+```
+Inverting a matrix
+Contrary to your intuition, inverting a matrix is not done by raising it to the
+power of –1. As explained in Chapter 6, R normally applies the arithmetic
+operators element‐wise on the matrix. So, the command first.matrix^(‐1)
+doesn’t give you the inverse of the matrix; instead, it gives you the inverse of
+the elements. To invert a matrix, you use the solve() function, like this:
+```{r}
+square.matrix <- matrix(c(1, 0, 3, 2, 2, 4, 3, 2, 1), ncol = 3)
+solve(square.matrix)
+
+my.vector <- 1:24
+dim(my.vector)= c(3, 4, 2)
+
+```
+
+```{r}
+baskets.df <- as.data.frame(t(baskets.team))
+
+boxplot(baskets.of.Geraldine,baskets.of.Granny)
+```
+```{r}
+employee <- c("John Doe", "Peter Gynn", "Jolie Hope")
+salary <- c(21000, 23400, 26800)
+startdate <- as.Date(c("2010-11-1", "2008-3-25", "2007-3-14"))
+employ.data<- data.frame(employee,salary,startdate)
+
+employ.data
+
+str(employ.data)
+```
+
+
+```{r}
+employ.data<- data.frame(employee,salary,startdate,stringsAsFactors = FALSE)
+
+str(employ.data)
+
+```
+
+```{r}
+
+```
+
+```{r}
+x <- c(0.458, 1.6653, 0.83112)
+percent <- round(x * 100, digits = 1)
+result <- paste(percent, "%", sep = "")
+print(result)
+```
+
+```{r}
+x <- 1:5
+test <- function(x){
+ cat("This is x:", x, "\n")
+ rm(x)
+ cat("This is x after removing it:", x, "\n")
+}
+
+```
+
+```{r}
+colnames<-c("col 1", "col 2", "col 3")
+rownames<-c("row 1", "row 2", "row 3","row 4")
+f<- matrix(c(1:12),ncol = 3)
+colnames(f)<-colnames
+row.names(f)<-rownames
+
+f  # as is
+```
+
+
+```{r}
+as.data.frame(f) #converting it into a dataframe
+
+```
+
+```{r}
+names <- c("Valentine Swindle"
+"Rex Simser,"
+Deloise Langenfeld,
+Guillermina Gard,
+Kasey Schreffler,
+Regan Vivas,
+Alisa Melson,
+Cheree Munch,
+Mercedez Rance
+Tynisha Buesing
+Landon Puig
+Rochel Fleeman
+Tabitha Marchi
+Luise Posada
+Lovie Droz
+Mindi Gros
+Lenny Corchado
+Xuan Bearse
+Lupe Mousseau
+Trenton Linder
+Phil Star
+Erminia Irving
+Lenard Glessner
+Normand Corning
+Antone Ketter
+Moshe Berryman
+Teisha Slowik
+Lyndia Kruger
+Althea Hardt
+Annis Smail
+Tonia Krouse
+Particia Pender
+Alona Been
+Wilma Solberg
+Bart Palladino
+Tempie Derry
+Tricia Stanwood
+Elmira Bridge
+Keesha Pettaway
+Laquita Imes
+Joni Hilaire
+Eliz Jesse
+Pura Marcinko
+Abraham Pettie
+Julieann Rodger
+Blake Schulze
+Thomasine Kettner
+Luetta Gudino
+Tania Vandam
+Wade Whitham)
+
+as.character(names)
+names
+
+```
+
+
+```{r}
+g<-matrix(c(1:25),ncol=5)
+g
+print("-***********************************")
+g<-matrix(c(1:25),ncol=5,byrow = TRUE)
+g
+```
+
+```{r}
+library(calculus)
+# numeric matrix
+x <- matrix(1:4, nrow = 2)
+x
+inverse(x)
+
+```
+
+```{r}
+## a slowly-convergent integral
+integrand <- function(x) {1/((x+1)*sqrt(x))}
+integrate(integrand, lower = 0, upper = Inf)
+```
+
+```{r}
+x<-NULL
+x<- 1:10
+
+f<- function(x) {2*x^9-6*x
+}
+integrate(f,lower=0,upper =90000000000000 )
+```
+
+```{r}
+
+f<- function(x) {2*x^9-6*x}
+f1<-function(x) {2*x^9-6*x}
+f2<-function(x) {2*x^9-6*x}
+f3<-function(x) {2*x^9-6*x}
+h = matrix(c(f,f1,f2,f3),ncol = 2,nrow = 2)
+h
+D(f,"x")
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(data= cars,aes(speed,dist,color=speed))+geom_point()
+
+
+```
+
+
+```{r}
+ggplot(ToothGrowth,aes(x=dose,y=len, fill=dose))+geom_boxplot()
+```
+
+```{r}
+p<-ggplot(ToothGrowth, aes(x=dose, y=len, fill=dose)) +
+  geom_boxplot()
+p
+```
+
+```{r}
+ggplot(ToothGrowth, aes(x=dose, y=len)) +
+  geom_boxplot(fill='#A4A4A4', color="black")+
+  theme_classic()
+# Change box plot colors by groups
+p<-ggplot(ToothGrowth, aes(x=dose, y=len, fill=dose)) +
+  geom_boxplot()
+p
+```
+
+```{r}
+# Convert the variable dose from a numeric to a factor variable
+ToothGrowth
+boxplot(ToothGrowth$len~ToothGrowth$dose,
+        color="red",xlab = "dose",ylab = "length",main="Tooth growth",grid=TRUE)
+
+
+```
+
+```{r}
+plot(cars, main="cars")
+abline(v=c(15,20),col=c("blue","purple"),lty=c(1,2),lwd=c(1,3))
+```
+
+```{r}
+cars$time<-cars$dist*cars$speed
+cars$number=as.double(c(1:50))
+cars
+
+
+
+
+```
+
+
+```{r}
+cars
+
+stem(cars$cars.number)
+
+```
+
+```{r}
+
+
+library(ggplot2)
+library(tidyverse)
+library(shiny)
+
+stem(faithful$eruptions)
+q<- ggplot(faithful,aes(eruptions,waiting,color=eruptions))
+q+geom_point()+ggtitle("              Eruptions vs waiting     ")+ theme(plot.background = element_rect(fill = 'green', colour = 'purple'))
+
+
+
+
+
+
+```
+
+```{r}
+# library
+library(ggplot2)
+ 
+# create a data frame
+variety=rep(LETTERS[1:7], each=40)
+treatment=rep(c("high","low"),each=20)
+note=seq(1:280)+sample(1:150, 280, replace=T)
+data=data.frame(variety, treatment ,  note)
+
+ggplot(data,aes(variety,note,color=treatment))+geom_boxplot()
+
+ggplot(data,aes(variety,note,fill=treatment))+geom_boxplot()
+```
+
+```{r}
+ggplot(data,aes(variety,note,color=treatment))+geom_boxplot()+facet_wrap(~treatment)
+ggplot(data,aes(variety,note,color=treatment))+geom_boxplot()+facet_wrap(~variety, scale="free")
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(data,aes(variety,note,color=treatment))+geom_boxplot()+ggtitle("asd")
+data
+ggplot(data,aes(note,color=treatment))+geom_density()
+```
+
+
+```{r}
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel(title = "Shiny Exercise"),
+  sidebarPanel(width = 4,
+    sliderInput("RandNum", label = "choose a number", 
+      value = 200, min = 10, max = 100)
+  ),
+  mainPanel(wideth = 8, plotOutput("scatter"))
+)
+
+server <- function(input, output)
+{output$scatter <- renderPlot({
+  x <- rnorm(input$RandNum)
+  y <- rnorm(input$RandNum)
+  plot(x, y, xlab = "x", ylab = "y", main = "Scatter plot")
+})
+ 
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+Usage
+integral2(fun, xmin, xmax, ymin, ymax, sector = FALSE, reltol = 1e-6, abstol = 0, maxlist = 5000, singular = FALSE, vectorized = TRUE, ...)
+
+integral3(fun, xmin, xmax, ymin, ymax, zmin, zmax, reltol = 1e-6, ...)
+Arguments
+fun
+function
+xmin, xmax
+lower and upper limits of x.
+ymin, ymax
+lower and upper limits of y.
+zmin, zmax
+lower and upper limits of z.
+sector
+logical.
+reltol
+relative tolerance.
+abstol
+absolute tolerance.
+maxlist
+maximum length of the list of rectangles.
+singular
+logical; are there singularities at vertices.
+```{r}
+library(SimplicialCubature)
+S = cbind(c(15,15),c(50,15),c(15,50))
+adaptIntegrateSimplex(function(v) v[1]+0.805, S)
+
+
+```
+
+```{r}
+data.matrix(summary(cars))
+
+
+```
+
+```{r}
+library(purrr)
+y <- list(0:10, 5.5)
+y %>% every(is.numeric)
+y %>% every(is.integer)
+y %>% some(is.integer)
+y %>% none(is.character)
+```
+
+```{r}
+library(ggplot2)
+library(sqldf)
+iris<- sqldf("SELECT * FROM iris")
+
+o<- ggplot(iris,aes(Species,Sepal.Length),main="asd")+geom_boxplot(fill = "white", colour = "black",outlier.colour = "red", outlier.shape = 1)
+iris
+o + geom_boxplot(outlier.shape = NA) + geom_jitter(width = 0.2)
+
+o+ geom_boxplot(aes(colour = Sepal.Length))+ggtitle("Petal and sepal length of three species of iris")+labs(x="Species",y="Sepal length")
+```
+
+
+```{r}
+library(ggplot2)
+library(plotly)
+ #plot
+iris_plot<- ggplot(iris,aes(Sepal.Length,Petal.Length,color=Species))+ geom_point()+ggtitle("Petal and sepal length of three species of iris")+labs(x="Sepal Length",y="Petal length") 
+#adding a background
+iris_plot<- iris_plot + theme(plot.background = element_rect(fill = 'green', colour = 'purple'))
+#using plotly
+ggplotly(iris_plot)
+
+
+```
+
+```{r}
+p<- ggplot(mpg,aes(class,hwy))
+p+geom_boxplot()+theme(plot.background = element_rect(fill = 'yellow', colour = 'blue'))
+```
+
+```{r}
+p <- ggplot(mpg, aes(class,hwy,fill=class))
+p + geom_boxplot()+ggtitle("asd")+labs(x="asd",y="ads")
+
+
+p <- ggplot(mpg, aes(class,hwy,color=class))
+p + geom_boxplot()+ggtitle("asd")+labs(x="asd",y="ads")
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(mpg,aes(class,displ,color=class))+geom_boxplot()+ggtitle("ads")+labs(x="class",y="display")
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(mpg,aes(hwy,color=fl))+geom_density()
+ggplot(mpg,aes(hwy,color=manufacturer))+geom_density()
+ggplot(mpg,aes(manufacturer,color=manufacturer))+geom_density()
+```
+```{r}
+print(x <- "Hello world!")
+print(digits=4 , x = 11/7)
+print(11/7,digits = 3)
+
+savehistory(file="Joel.Rhistory") #This saaves the entire history.
+
+loadhistory(file="Joel.Rhistory")
+```
+
+```{r}
+paste("Hello world")
+```
+
+```{r}
+baskets.of.Granny <- c(12, 4, 4, 6, 9, 3)
+baskets.of.Geraldine <-
+ c(5, 3, 2, 2, 12, 9)
+Intro <- "It is amazing! The All Star Grannies scored
+a total of"
+Outro <- "baskets in the last six games!"
+Total.baskets <- baskets.of.Granny + baskets.of.Geraldine
+
+text <- paste(Intro,sum(Total.baskets),outro)
+
+print((text)) ## This is the wrong way in this case
+noquote("*****************************************")
+cat(text) #This is the right way.
+```
+Using mathematical functions
+In R, of course, you want to use more than just basic operators. R comes with
+a whole set of mathematical functions you’d find on a technical calculator
+as well, and then some more. Table 4-2 lists the ones that we think you’ll use
+most often, but feel free to go on a voyage of discovery for others. All these
+functions are vectorized, so you can use them on complete vectors.
+The possibilities of R go far beyond this small list of functions, however. We
+cover some of the special cases in the following sections.
+```{r}
+x=6
+y=3
+x%%y
+x%/%y
+log(x,base=y)
+abs(x/y)
+exp(x)
+sqrt(y)
+factorial(y)
+
+choose(x,y)
+log(1:10)
+
+floor(pi)
+ceiling(pi)
+trunc(pi)
+```
+```{r}
+"+"(2,3)
+"-"(2,3)
+"/"(2,3)
+"*"(2,3)
+
+is.finite(10^(305:315))
+```
+
+```{r}
+length(baskets.of.Geraldine)
+```
+Replacing data in a matrix
+```{r}
+t <- c(1:5)
+t[c(2,5)]<-10
+t
+
+t>2
+which(t>3) #The answer indicate the positions the data is found.
+
+```
+x == y Returns TRUE if x exactly equals y
+x != y Returns TRUE if x differs from y
+x > y Returns TRUE if x is larger than y
+x >= y Returns TRUE if x is larger than or exactly equal to y
+x < y Returns TRUE if x is smaller than y
+x <= y Returns TRUE if x is smaller than or exactly equal to y
+x & y Returns the result of x and y
+x | y Returns the result of x or y
+! x Returns not x
+xor( x, y ) Returns the result of x xor y (x or y but not x and y)
+```{r}
+The.best <- baskets.of.Geraldine<baskets.of.Granny
+
+which(The.best)
+```
+
+Table 4-5 Vector Operations
+Function What It Does
+sum(x) Calculates the sum of all values in x
+prod(x) Calculates the product of all values in x
+min(x) Gives the minimum of all values in x
+max(x) Gives the maximum of all values in x
+cumsum(x) Gives the cumulative sum of all values in x
+cumprod(x) Gives the cumulative product of all values in x
+cummin(x) Gives the minimum for all values in x from the start
+of the vector until the position of that value
+cummax(x) Gives the maximum for all values in x from the start
+of the vector until the position of that value
+diff(x) Gives for every value the difference between that
+value and the next value in the vector
+
+
+
+Leaflet
+```{r}
+library(leaflet)
+m <- leaflet()%>%
+  addTiles() %>%
+  addMarkers(lng =-82.577140,lat = 28.082520 )
+m%>% addProviderTiles(providers$Stamen.Toner)
+
+```
+
+
+```{r}
+m %>% addProviderTiles(providers$Esri.NatGeoWorldMap)
+```
+
+```{r}
+library(leaflet)
+m<- leaflet()%>%
+  addTiles() %>%
+  addMarkers(lat =28.082520 ,lng =-82.577140 )%>%
+  
+  addMiniMap()
+
+  
+m
+```
+
+```{r}
+velocity<- function(dist,time)# variable     
+  {
+  return(dist/time)
+}
+
+```
+
+```{r}
+
+velocity()
+```
+
+```{r}
+f<- function(x){
+  return(5*x^3+1)
+}
+
+```
+
+```{r}
+library(ggplot2)
+x<-c(0,20)
+axis<-data.frame(x)
+ggplot()+
+  stat_function(data=axis,aes(x),fun=f)+
+  ggtitle("This is an example of a line graphed")
+```
+
+
+```{r}
+g <- NULL
+g<- function(x,y)
+  return(x^6+x^3-2*x^5*9)
+
+```
+
+```{r}
+g(5,6)
+x <- c(5,50)
+axis<- NULL
+axis<-data.frame(x)
+ggplot()+
+  stat_function(data=axis,aes(x),fun=g)+
+  ggtitle("This is an example of a line graphed")
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+

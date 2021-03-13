@@ -1,0 +1,150 @@
+---
+title: "R Programming: Advance Analytics in R for Data Science part 2"
+output: html_notebook
+---
+
+
+```{r}
+getwd()
+setwd("/Users/steph/OneDrive/Documents/R Projeccts")
+util <- read.csv("P3-Machine-Utilization.csv")
+util
+
+#derive utilization
+util$utilization = 1-util$Percent.Idle
+util
+#?POSIXct
+util$PosixTime<-as.POSIXct(util$Timestamp,format="%d/%m/%Y %H:%M")
+util_backup = util
+
+util$Timestamp = NULL
+util <- util[,c(4,1,2,3)]
+summary(util)
+util
+```
+```{r}
+RL1 = util[util$Machine=="RL1",]
+summary(RL1)
+
+RL1$Machine<- factor(RL1$Machine)
+summary(RL1)
+
+```
+
+getting the mean, median and max
+```{r}
+util_stats_RL1 = c(min(RL1$utilization,na.rm = T),
+                median(RL1$utilization,na.rm = T),
+                max(RL1$utilization,na.rm = T))
+
+util_stats_RL1
+```
+
+```{r}
+length(which(RL1$utilization <0.90))
+util_under_90_flag<- length(which(RL1$utilization <0.90))>0
+util_under_90_flag
+```
+
+
+```{r}
+list_RL1 = list("RL1",util_stats_RL1,util_under_90_flag)
+list_RL1
+names(list_RL1)
+names(list_RL1)<-c("Machine","stats","LowThreshold")
+list_RL1
+```
+
+```{r}
+rm(list_RL1)
+list_RL1 <- list(Machine="RL1", Stats=util_stats_RL1,LowThreshold=util_under_90_flag)
+list_RL1
+
+```
+
+
+```{r}
+my_list<-list(Joel=)
+
+```
+
+
+extracting components of a list 
+3 ways
+[]-will return a list
+[[]]- will return an object
+$- same as [[]] but prettier
+```{r}
+list_RL1
+list_RL1[1]
+list_RL1[[1]]
+list_RL1$Machine
+
+
+
+list_RL1[2]
+list_RL1[[2]]
+typeof(list_RL1[[2]])
+
+list_RL1$Stats
+
+typeof(list_RL1$Stats)
+
+list_RL1[3]
+list_RL1[[3]]
+list_RL1$LowThreshold
+
+
+
+list_RL1
+list_RL1[[2]][3]
+list_RL1$Stats[3]
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+

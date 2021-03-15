@@ -1,0 +1,263 @@
+---
+title: "R Programming: Advance Analytics in R for Data Science 3"
+output: html_notebook
+---
+You are working on a project for a meteorology bureau. You have been supplied
+weather data for 4 cities in the US: Chicago, NewYork, Houston and SanFrancisco.
+You are required to deliver the following outputs:
+1. A table showing the annual averages of each observed metric for every city
+2. A table showing by how much temperature fluctuates each month from min to
+max (in %). Take min temperature as the base
+3. A table showing the annual maximums of each observed metric for every city
+4. A table showing the annual minimums of each observed metric for every city
+5. A table showing in which months the annual maximums of each metric were
+observed in every city (Advanced)
+
+```{r}
+getwd()
+
+setwd("/Users/steph/OneDrive/Documents/R Projeccts")
+
+Chicago<- read.csv("Chicago-F.csv",row.names = 1)
+NewYork<- read.csv("NewYork-F.csv",row.names = 1)
+Houston<- read.csv("Houston-F.csv",row.names = 1)
+SanFrancisco<- read.csv("SanFrancisco-F.csv",row.names = 1)
+
+Chicago
+NewYork
+Houston
+SanFrancisco
+is.data.frame(Chicago)
+```
+Let's convert to matrices
+```{r}
+Chicago<-as.matrix(Chicago)
+NewYork<-as.matrix(NewYork)
+Houston<-as.matrix(Houston)
+SanFrancisco<-as.matrix(SanFrancisco)
+# lets put everything into a list
+Weather <- list(Chicago=Chicago,NewYork=NewYork,Houston=Houston,SanFrancisco=SanFrancisco)
+Weather[3]
+Weather[[3]]
+Weather$Houston
+summary(Weather$Houston)
+
+```
+Example of apply function  in a simple matrix.
+
+The Apply Family is the most powerful set of tools in R.
+```{r}
+t = matrix(c(27,1,44,63,54,14,42,34,54,111,98,101,12,21,2),ncol=5,nrow=3)
+t
+
+noquote("---------------check example below---------------------------")
+apply(t,1,mean)             
+apply(t,2,max)
+apply(t,2,mean)  
+```
+
+```{r}
+#help(apply)
+Chicago
+apply(Chicago,1,mean)
+#check
+mean(Chicago["DaysWithPrecip",])
+
+#analyze one city:
+
+Chicago
+apply(Chicago,1,max)
+apply(Chicago,1,min)
+#for practice
+#this does not make much sense but this is good data to compare.
+apply(Chicago,2,max)
+apply(Chicago,2,min)
+#Compare:
+apply(Chicago,1, mean)
+apply(NewYork,1, mean)
+apply(Houston,1, mean)
+apply(SanFrancisco,1, mean)
+```
+
+```{r}
+output<-NULL  #Preparing an empty vector
+
+for(i in 1:5){
+  output[i]<-mean(Chicago[i,])
+}
+
+output
+names(output)<-rownames(Chicago)
+output
+               #VS
+
+noquote("--------------------------------")
+apply(Chicago,1,mean) #only a liine of quote.
+
+
+#apply can do anything we can do with loops.
+
+
+
+
+```
+
+```{r}
+?lapply
+Chicago
+t(Chicago)
+Weather
+lapply(Weather,t)
+mynewlist<- lapply(Weather,t)
+mynewlist
+
+
+
+```
+Example 2
+```{r}
+Chicago
+rbind(Chicago,NewRow=1:12)
+lapply(Weather,rbind,NewRow=1:12)
+
+```
+example 3
+```{r}
+?rowMeans
+rowMeans(Chicago) #identical to : apply(Chicago,1,mean)
+
+noquote("-------------------------------")
+
+lapply(Weather,rowMeans)
+```
+Combining lapply with [] operator
+```{r}
+#Weather
+Weather$Chicago[1,1]
+Weather[[1]][1,1]
+lapply(Weather,"[",1,1)
+#Weather
+lapply(Weather, "[",1,)
+lapply(Weather, "[", ,3)
+```
+
+```{r}
+#adding your own functions
+lapply(Weather,rowMeans)
+noquote("-------------------------------")
+lapply(Weather, function(x) x[1,]) #every row from every matrix
+noquote("-------------------------------")
+lapply(Weather, function(x) x[5,]) #every row from every matrix
+noquote("-------------------------------")
+lapply(Weather, function(x) x[,1]) #november data
+noquote("-------------------------------")
+lapply(Weather, function(x) x[,12]) #december data
+noquote("-------------------------------")
+lapply(Weather, function(o) o[1,]-o[2,]) #december data
+
+
+```
+
+```{r}
+Weather
+noquote("-------------------------------")
+lapply(Weather,function(z)z[1,]-z[2,])
+noquote("-------------------------------")
+lapply(Weather,function(z)round((z[1,]-z[2,])/z[2,],2))
+
+```
+Average F for July:
+```{r}
+lapply(Weather,"[",1,7)
+noquote("------------------------------")
+sapply(Weather,"[",1,7)
+
+```
+
+```{r}
+noquote("------------------------------")
+lapply(Weather,"[",1,10:12)
+noquote("------------------------------")
+sapply(Weather,"[",1,10:12)
+noquote("------------------------------")
+round(sapply(Weather,rowMeans),0)
+noquote("------------------------------")
+```
+Another example
+```{r}
+lapply(Weather,
+       function(z)round((z[1,]-z[2,])/z[2,],2))
+
+round(sapply(Weather,
+             function(z)round((z[1,]-z[2,])/z[2,],2)),3)#This function looks better.
+```
+Nesting lapply function
+```{r}
+lapply(Weather,rowMeans)
+sapply(Weather,rowMeans)
+#?rowMeans
+Chicago
+apply(Chicago, 1, max)
+
+
+noquote("---------------------------------------")
+
+lapply(Weather,apply, 1, max) # BE  very careful when doing this
+
+sapply(Weather,apply, 1, max) # BE  very careful when doing this
+lapply(Weather,function(x)apply(x, 1, max))
+sapply(Weather,function(x)apply(x, 1, max))
+```
+THIS IS THE MOST ADVANCED PART OF THE TUTORIAL
+```{r}
+#?which.max
+which.max(Chicago[1,])
+noquote(names
+        (which.max
+          (Chicago[1,])))
+
+noquote(
+  apply(Chicago,1, function(x) names(which.max(x))))
+
+
+#iterating throughout the whole list
+
+noquote(lapply
+        (Weather,
+          function(y)apply(Chicago,1, 
+                           function(x) names(which.max(x)))))
+
+noquote(
+  sapply(Weather,
+         function(y)apply(Chicago,1, 
+                          function(x) names(which.max(x)))))
+```
+QUICK RECAP:
+1. HOW THE APPLY FAMILY OF FUNCTIONS WORKS.
+2.HOW TO RECREATE THE APPLY STATEMENT WITH A FOR() LOOP.
+3.WHEN TO USE APPLY(), LAPPLY(), OR SAPPLY.
+4. HOW TO COMBINE LAPPLY() WITH[].
+5. HOW TO NEST YOUR OWN FUNCTIONS IN APPLY-TYPE FUNCTIONS.
+6.HOW TO NEST APPLY-TYPE FUNCTION WITHIN EACH OTHER.
+7. HOW TO USE THE WHICH.MAX() AND WHICH.MIN() FUNCTIONS.
+```{r}
+M = matrix(c(1:50),ncol=5,nrow = 10)
+M
+M[5,]
+
+```
+
+```{r}
+
+M1 <- rbind(c(100,200,300,400,500), rep(10,5))
+M2 <- rbind(1:5, rep(10,5))
+MyAwesomeList <- list(M1, M2)
+MyAwesomeList
+
+
+
+
+
+
+```
+

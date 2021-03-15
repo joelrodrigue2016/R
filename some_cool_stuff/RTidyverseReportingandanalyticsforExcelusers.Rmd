@@ -1,0 +1,1331 @@
+---
+title: "R Tidyverse Reporting and analytics for Excel users"
+output: 
+If you use Excel for any type of reporting or analytics then this course is for you. There are a lot of great courses teaching R for statistical analysis and data science that can sometimes make R seem a bit too advanced for every day use. Also since there are many different ways of using R that can often add to the confusion. The reality is that R can be used to make your every day reporting analytics that you do in Excel much faster and easier without requiring any complex statistical techniques while at the same time giving you a solid foundation to expand into those areas if you so wish. This course uses the Tidyverse standards for using R which provides a single, comprehensive and easy to understand method for using R without complicating things via multiple methods. It's designed to build upon the the skills you are already familiar with in Excel to shortcut your learning journey. 
+---
+
+
+```{r}
+setwd("C:/Users/steph/OneDrive/Documents/R Projeccts")
+library(tidyverse)
+dt<- read.csv("/Users/steph/OneDrive/Documents/R Projeccts/EmployeeData.csv")
+
+dt %>% mutate(
+  AnnualBaseSalary = ifelse(frequency=="Hourly",base*40*52,base*5*52),
+  AnnualTotalCompensation = ifelse(frequency=="Hourly",base*40*52,base*5*52),
+  AnualBonus = AnnualTotalCompensation-AnnualBaseSalary
+)%>%view
+
+
+
+
+```
+
+```{r}
+setwd("C:/Users/steph/OneDrive/Documents/R Projeccts")
+library(tidyverse)
+dt<- read.csv("/Users/steph/OneDrive/Documents/R Projeccts/EmployeeData.csv")
+
+dt %>% mutate(
+  AnnualBaseSalary = ifelse(frequency=="Hourly",base*40*52,base*5*52),
+  AnnualTotalCompensation = ifelse(frequency=="Hourly",base*40*52,base*5*52),
+  AnualBonus = AnnualTotalCompensation-AnnualBaseSalary
+)#%>%view By removing the pipe operator here, now the calculated data gets addedto the table.
+
+```
+
+
+```{r}
+library(tidyverse)
+dt<- read.csv("/Users/steph/OneDrive/Documents/R Projeccts/EmployeeDataProcessed.csv")
+dt %>% 
+  group_by(county)%>%
+  count()%>% 
+  arrange(desc(n))
+dt %>% filter(county == "LEWIS AND CLARK") %>%
+  group_by(department)%>%
+  summarise(
+   avg_base = mean(AnnualBase),
+   median_base= median(AnnualBase),
+   total_base= sum(AnnualBase)
+  )
+  
+dt %>% filter(county =="LEWIS AND CLARK")%>%
+  group_by(department)%>%
+  summarize_if(is.numeric,mean)
+
+
+
+
+```
+Pipes
+The pipe operator (%>%) from the magrittr package makes it easy to chain these actions together: the output of one function becomes the input of the next.
+
+surveys %>%
+  filter(weight < 5) %>%
+  select(species_id, sex, weight)
+Another cumbersome bit of typing. In RStudio, type Ctrl + Shift + M and the %>% operator will be inserted.
+
+In the above we use the pipe to send the surveys data set first through filter, to keep rows where wgt was less than 5, and then through select to keep the species and sex columns. When the data frame is being passed to the filter() and select() functions through a pipe, we don’t need to include it as an argument to these functions anymore.
+
+If we wanted to create a new object with this smaller version of the data we could do so by assigning it a new name:
+
+surveys_sml <- surveys %>%
+  filter(weight < 5) %>%
+  select(species_id, sex, weight)
+Note that the final data frame is the leftmost part of this expression.
+
+Challenge
+Using pipes, subset the data to include individuals collected before 1995, and retain the columns year, sex, and weight.
+
+Mutate
+Frequently you’ll want to create new columns based on the values in existing columns, for example to do unit conversions, or find the ratio of values in two columns. For this we’ll use mutate().
+
+To create a new column of weight in kg:
+
+surveys %>%
+  mutate(weight_kg = weight / 1000)
+If this runs off your screen and you just want to see the first few rows, you can use a pipe to view the head() of the data (pipes work with non-dplyr functions too, as long as the dplyr or magrittr packages are loaded).
+
+surveys %>%
+  mutate(weight_kg = weight / 1000) %>%
+  head
+The first few rows are full of NAs, so if we wanted to remove those we could insert a filter() in this chain:
+
+surveys %>%
+  filter(!is.na(weight)) %>%
+  mutate(weight_kg = weight / 1000) %>%
+  head
+is.na() is a function that determines whether something is or is not an NA. The ! symbol negates it, so we’re asking for everything that is not an NA.
+
+Challenge
+Create a new dataframe from the survey data that meets the following criteria: contains only the species_id column and a column that contains values that are the square-root of hindfoot_length values (e.g. a new column hindfoot_sqrt). In this hindfoot_sqrt column, there are no NA values and all values are < 3.
+
+Hint: think about how the commands should be ordered
+
+Split-apply-combine data analysis and the summarize() function
+Many data analysis tasks can be approached using the “split-apply-combine” paradigm: split the data into groups, apply some analysis to each group, and then combine the results. dplyr makes this very easy through the use of the group_by() function. group_by() splits the data into groups upon which some operations can be run. For example, if we wanted to group by sex and find the number of rows of data for each sex, we would do:
+
+surveys %>%
+  group_by(sex) %>%
+  tally()
+Here, tally() is the action applied to the groups created to group_by() and counts the total number of records for each category. group_by() is often used together with summarize() which collapses each group into a single-row summary of that group. So to view mean weight by sex:
+
+surveys %>%
+  group_by(sex) %>%
+  summarize(mean_weight = mean(weight, na.rm = TRUE))
+You can group by multiple columns too:
+
+surveys %>%
+  group_by(sex, species_id) %>%
+  summarize(mean_weight = mean(weight, na.rm = TRUE))
+It looks like most of these species were never weighed. We could then discard rows where mean_weight is NA with filter():
+
+surveys %>%
+  group_by(sex, species_id) %>%
+  summarize(mean_weight = mean(weight, na.rm = TRUE)) %>%
+  filter(!is.na(mean_weight))
+Another thing we might do here is sort rows by mean_weight, using arrange().
+
+surveys %>%
+  group_by(sex, species_id) %>%
+  summarize(mean_weight = mean(weight, na.rm = TRUE)) %>%
+    filter(!is.na(mean_weight)) %>%
+    arrange(mean_weight)
+If you want them sorted from highest to lowest, use desc().
+
+surveys %>%
+  group_by(sex, species_id) %>%
+  summarize(mean_weight = mean(weight, na.rm = TRUE)) %>%
+    filter(!is.na(mean_weight)) %>%
+    arrange(desc(mean_weight))
+Also note that you can include multiple summaries.
+
+surveys %>%
+  group_by(sex, species_id) %>%
+  summarize(mean_weight = mean(weight, na.rm = TRUE),
+            min_weight = min(weight, na.rm = TRUE)) %>%
+    filter(!is.na(mean_weight)) %>%
+    arrange(desc(mean_weight))
+    
+```{r}
+```
+
+
+```{r}
+library("dplyr")  
+select(surveys, plot_id, species_id, weight)
+```
+    
+    
+    Pivoting the data
+```{r}
+wideData<- dt %>% filter(county == "LEWIS AND CLARK") %>%
+  group_by(department,year)%>%
+  summarize(TotalBase = sum(AnnualBase))%>%
+  pivot_wider(names_from = year,values_from = TotalBase)
+```
+
+Unpivoting the data
+```{r}
+wideData %>%pivot_longer(-department,names_to = "Year",values_to = "Base")
+```
+
+```{r}
+library(tidyverse)
+A <- read.csv("/Users/steph/OneDrive/Documents/R Projeccts/Employees.csv")
+B <- read.csv("/Users/steph/OneDrive/Documents/R Projeccts/EmployeeData.csv")
+A
+B
+left_join(A,B) # If left this way, R will make the asumption for us.
+left_join(A,B,by=c("EmployeeID" = "EmployeeID"))
+
+right_join(A,B)
+anti_join(A,B)
+full_join(A,B)
+inner_join(A,B)
+
+semi_join(A,B)
+```
+
+
+```{r}
+DepartmentHistory <- read.csv("/Users/steph/OneDrive/Documents/R Projeccts/DepartmentHistory.csv")
+DepartmentHistory 
+latestDepartmentHistory<-left_join(A,DepartmentHistory)
+DepartmentHistory %>% arrange(desc(Year))%>% 
+  distinct(EmployeeID,.keep_all = TRUE)
+
+left_join(A,latestDepartmentHistory)
+```
+
+```{r}
+library(tidyverse)
+dt <- read.csv("/Users/steph/OneDrive/Documents/R Projeccts/EmployeeDataProcessed.csv")
+dt %>%
+  filter(county == "LEWIS AND CLARK") %>%
+  group_by(department,county)%>%
+  summarise_if(is.numeric,sum)%>%
+  write.csv("EmployeeSummarised.csv")
+```
+
+
+
+```{r}
+library(tidyverse)
+library(forecast)
+cars$cars.time<- NULL
+cars %>% plot()
+data.frame(AirPassengers)
+AirPassengers%>% forecast %>% plot(col="red")
+AirPassengers %>% plot()
+
+
+cars$cars.speed %>% forecast %>% plot()
+
+```
+
+GGplot stands for the grammar of graphics.
+
+```{r}
+library(tidyverse)
+mpg
+ggplot(mpg)+geom_point(mapping = aes(x= displ,y=hwy, color=class))
+
+
+#myway
+ggplot(mpg,aes(x=displ,y=hwy,color=class))+geom_point()
+ggplot(mpg,aes(x=displ,y=hwy,size=class))+geom_point()
+ggplot(mpg,aes(x=displ,y=hwy,shape=class))+geom_point()
+ggplot(mpg,aes(x=displ,y=hwy,alpha=class))+geom_point()
+
+
+
+#combined
+ggplot(mpg,aes(x=displ,y=hwy,color=class,size=year, shape=drv))+geom_point()  #do not incluide the alpha function
+
+ggplot(mpg,aes(x=displ,y=hwy,color=class,size=year))+geom_point()
+```
+
+```{r}
+ggplot(mpg,aes(x=hwy,y=displ,fill=class))+geom_col()
+
+ggplot(mpg,aes(x=class,y=hwy,fill=class))+geom_boxplot()
+
+
+```
+
+
+```{r}
+
+ggplot(mpg,aes(x=displ,y=hwy),method="lm")+geom_smooth()
+
+ggplot(mpg) + geom_smooth(mapping=aes(x=displ,y=hwy),method="lm")
+
+ggplot(mpg) + geom_text(mapping=aes(x=displ,y=hwy,label=class),check_overlap = TRUE)
+```
+combining plots
+```{r}
+library(tidyverse)
+library(plotly)
+ggplot(mpg)+geom_jitter(mapping = aes(x=displ,y=hwy,color=class))+geom_smooth(mapping = aes(x=displ,y=hwy))
+
+
+
+#my way
+ff5<-ggplot(mpg)+geom_jitter(mapping = aes(x=displ,y=hwy,color=class))+geom_smooth(mapping = aes(x=displ,y=hwy))
+
+ggplotly(ff5)
+
+
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(mpg,mapping=aes(x=displ,y=hwy))+
+  geom_jitter(mapping = aes(color=class))+
+  geom_smooth()+
+  annotate("rect",xmin = 1.5,xmax=2,ymin=40,ymax=45,color="red",alpha=0.3)+
+annotate("text", x=3.5,y=43,label="   Let's highlight these \n outliers")+
+  annotate("rect",xmin=3,xmax=4.0,ymin=20,ymax=30,color="blue",alpha=0.2)+
+ggtitle("your title", "your subtitle")
+```
+
+```{r}
+library(tidyverse)
+ggplot(mpg)+ geom_jitter(aes(x=displ,y=hwy,color=class))+facet_wrap(~class)
+
+ggplot(mpg)+ geom_jitter(aes(x=displ,y=hwy,color=class))+facet_grid(year~class)
+```
+
+Plotly library 
+```{r}
+library(plotly)
+library(tidyverse)
+
+#mpg #f1 key provides additional informartion
+g<- ggplot(mpg)+
+  geom_point(mapping=aes(x=displ,y=hwy,color=class))
+ggplotly(g)
+
+```
+
+```{r}
+library(plotly)
+library(tidyverse)
+library(ggplot2)
+boxplot<-ggplot(mpg,aes(x=class,y=hwy,fill=class))+geom_boxplot()
+ggplotly(boxplot)
+```
+
+
+```{r}
+library(forecast)
+library(tidyverse)
+library(highcharter)
+
+#mpg #f1 key provides additional informartion
+hchart(mpg,"scatter",
+       hcaes(x=displ,y=hwy, group = class))
+forecast(AirPassengers) %>% hchart()
+
+```
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(DT)
+mpg$cty %>% summary()
+ctypercentiles <-mpg$cty %>% quantile(c(0.25,0.75))
+
+mpg%>% datatable(rownames = F) %>%
+  formatCurrency("displ", currency = "$", digits =2)%>%
+  formatStyle("cty",
+    backgroundColor = styleInterval(ctypercentiles,c("green","yellow","red")),
+    color= styleInterval(ctypercentiles,c("white", "blue","white"))) %>%
+  formatStyle("hwy",background = styleColorBar(mpg$hwy,"steelblue"))
+
+```
+
+
+```{r}
+mtcars %>% 
+  group_by(cyl) %>% 
+  count()
+
+library(tidyverse)
+
+Employees <- tibble(
+  EmployeeID = c("01001", "01002", "01007"), 
+  Name = c("Tony","Bruce","Nick")
+)
+
+EmployeeData <- tibble(
+  EmployeeID = c("01001", "01002", "01008"), 
+  BaseSalary = c(90000,20000,50000),
+  Department = c("Technology","Research","Finance")
+)
+
+Employees <- left_join(Employees,EmployeeData,by="EmployeeID")
+Employees <- left_join(Employees,EmployeeData,by="EmployeeID")
+
+
+```
+
+```{r}
+library(DT)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+datatable(mpg)
+library(forecast)
+library(highcharter)
+
+h<- ggplot(mpg,mapping = aes(x=displ,y=cty,color=class))+geom_point()
+ggplotly(h)
+
+hh<-ggplot(mpg,mapping = aes(x=class,y=hwy, fill=class))+geom_boxplot()
+
+
+mpg$hwy%>%forecast%>%
+hchart()
+
+```
+
+
+```{r}
+library(highcharter)
+library(DT)
+library(tidyverse)
+library(forecast)
+
+
+mpg5<- mpg%>% forecast
+
+
+```
+
+```{r}
+library(highcharter)
+library(DT)
+library(tidyverse)
+library(forecast)
+p<-y1 <- seq(from = 0, to = 10, length.out = 10)
+p<-c(1:20,20:40)
+
+p%>%forecast%>%hchart()
+#p%>%hchart()
+```
+
+
+```{r}
+library(highcharter)
+library(DT)
+library(tidyverse)
+library(forecast)
+p <- seq(from=0,to=20,length.out = 100)
+p1<-(sin(15*p))
+plot(p,p1,type="l", col="blue")
+
+p1%>%forecast%>%hchart(color="red")
+```
+
+```{r}
+data(unemployment)
+
+unemployment_map<- hcmap("countries/us/us-all-all", data = unemployment,
+      name = "Unemployment", value = "value", joinBy = c("hc-key", "code"),
+      borderColor = "transparent") %>%
+  hc_colorAxis(dataClasses = color_classes(c(seq(0, 10, by = 2), 50))) %>% 
+  hc_legend(layout = "vertical", align = "right",
+            floating = TRUE, valueDecimals = 0, valueSuffix = "%") 
+
+unemployment_map
+```
+
+```{r}
+highchart() %>%
+hc_chart(type = "column") %>%
+hc_title(text = "A highcharter chart") %>%
+hc_xAxis(categories = 2012:2016) %>%
+hc_add_series(data = c(3900, 4200, 5700, 8500, 11900),
+name = "Downloads")
+```
+
+```{r}
+AirPassengers%>%forecast%>%hchart()
+```
+
+```{r}
+
+```
+
+```{r}
+library(gmailr)
+library(esquisse)
+library(tidyverse)
+library(tidyverse)
+test_email <-
+  gm_mime() %>%
+  gm_to("joel134748@gmail.com") %>%
+  gm_from("joelrodrigue2016@fau.edu") %>%
+  gm_subject("this is just a gmailr test") %>%
+  gm_text_body("Can you hear me now?")
+
+
+
+
+
+messageIDs<- messages("from:@joel134748@gmail.com",200)
+
+```
+
+```{r}
+## search for 250,000 tweets containing the word data
+## install rtweet from CRAN
+install.packages("rtweet")
+
+## load rtweet package
+library(rtweet)
+```
+
+```{r}
+## install remotes package if it's not already
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
+}
+
+
+
+```
+
+```{r}
+## load rtweet package
+library(rtweet)
+library(highcharter)
+library(DT)
+library(tidyverse)
+library(forecast)
+library(plotly)
+
+vehicles<- mpg%>%
+  group_by(displ,class)%>%
+  summarise(hwy=sum(hwy))%>%
+  spread(class,hwy)%>%
+  gather(class,hwy,-displ,na.rm = TRUE)
+vehicles
+vehicles_plot<- ggplot(vehicles,aes(x=class,y=hwy,color=class))+geom_point()
+
+ggplotly(vehicles_plot)
+
+
+```
+
+```{r}
+## load rtweet package
+library(rtweet)
+library(highcharter)
+library(DT)
+library(tidyverse)
+library(forecast)
+library(plotly)
+
+dd<- mpg%>%
+  group_by(displ,class)%>%
+  summarise(hwy=sum(hwy))%>%
+  spread(class,hwy)%>%
+  gather(class,hwy,-displ,na.rm = TRUE)%>%ggplot(aes(x=displ,y=hwy,fill=class))+geom_col()+ggtitle("Vehicle data types")+ theme(plot.background = element_rect(fill = "green"))+labs(x="display",y="highway")
+
+ggplotly(dd)
+
+
+
+```
+Example no real data will be generated. 
+```{r}
+library(tidyverse)
+dataf<- dir("data",full.names = TRUE)%>%map_df(read_csv)
+
+
+
+dir("csvFilesToMerge/",full.names = TRUE) %>% map_df(read_csv)
+
+```
+
+```{r}
+install.packages("ggthemes")
+library(ggthemes) # Load
+```
+
+```{r}
+
+library(tidyverse)
+
+dt <- read_csv("EmployeeDataProcessed.csv")
+
+glimpse(dt)
+
+dt %>% group_by(county) %>% 
+  count() %>% 
+  arrange(desc(n))
+
+dt %>% 
+  filter(county == "LEWIS AND CLARK") %>% 
+  group_by(department) %>% 
+  summarise(
+    AvgBase = mean(AnnualBase),
+    MedianBase = median(AnnualBase),
+    TotalBase = sum(AnnualBase)
+  )
+
+dt %>% 
+  filter(county == "LEWIS AND CLARK") %>% 
+  group_by(department) %>% 
+  summarise_if(is.numeric,mean) 
+
+dt %>% 
+  filter(county == "LEWIS AND CLARK") %>% 
+  group_by(department,year) %>% 
+  summarise(TotalBase = sum(AnnualBase)) %>% 
+  spread(year,TotalBase)
+```
+
+```{r}
+library(tidyverse)
+
+dt <- read_csv("EmployeeDataProcessed.csv")
+glimpse(dt)
+
+dt %>% group_by(county)%>%
+  count()%>%
+  arrange(desc(n))
+
+dt%>%filter(county=="LEWIS AND CLARK")%>%
+  group_by(department) %>%
+  summarise(
+   avgbase=mean(AnnualBase),medianbase=median(AnnualBase),
+   TotalBase=sum(AnnualBase)
+  )
+
+dt%>%filter(county=="LEWIS AND CLARK")%>%
+  group_by(department) %>%
+  summarise_if(is.numeric,median)
+
+
+
+dt %>% 
+  filter(county == "LEWIS AND CLARK") %>% 
+  group_by(department,year) %>% 
+  summarise(TotalBase = sum(AnnualBase)) %>% 
+  spread(year,TotalBase)
+```
+
+```{r}
+rboot2016 <- list(month="August", year=2015, 
+                  instructor="Joel",attendance=100)
+class(rboot2016)<-"workshop"
+
+rboot2016
+
+```
+
+```{r}
+friends<- list(friends="Dino", "Staphanie","Tash","Antonio","Wayne","Martin",
+               "Moises", meeting="FAU", year=2020)
+class(friends)<-"meeting"
+
+friends[2]<-"Michelle"
+
+friends
+
+
+```
+
+```{r}
+library(tidyverse)
+x <- list(a=1:5,b=rnorm(10),c=(1:50))
+x1<- matrix(c(1:250),ncol=50,nrow = 10)
+x1
+lapply(x1,function(elt))
+sapply(x1, mean)
+
+
+
+```
+
+```{r}
+Account_Number= 14000252174084
+Routing_Number= 271081528
+
+joels_account<- list(Account_Number= 14000252174084,Routing_Number= 271081528)
+
+
+```
+
+```{r}
+download.file('http://finance.yahoo.com/q?s=aapl&x=0&y=0','quote.html')
+
+grep('Last Trade:',x)
+gsub('^.*<big><b><span [^>]*>([^<]*)</span>.*$','\\1',x[45])
+
+getquote = function(sym){
++    baseurl = 'http://finance.yahoo.com/q?s='
++    myurl = paste(baseurl,sym,'&x=0&y=0',sep='')
++    x = readLines(myurl)
++    q = gsub('^.*<big><b><span [^>]*>([^<]*)</span>.*$','\\1',grep('Last Trade:',x,value=TRUE))
++    as.numeric(q)
++}
+```
+
+```{r}
+data(iris)
+library(ggplot2)
+library(plotly)
+iris_plot<- ggplot(data=iris,aes(x=Sepal.Width,y=Petal.Length, color=Species))+geom_point()+ggtitle("                                                 iris data")+
+  labs(x="Sepal width",y="Petal length")+theme(plot.background = element_rect(fill = "yellow"))+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "red")
+  )
+ggplotly(iris_plot)
+
+```
+
+```{r}
+data(iris)
+library(ggplot2)
+library(plotly)
+k<- ggplot(iris,aes(x=Sepal.Length,y=Petal.Length,fill=Species))+geom_boxplot()+theme(plot.background = element_rect(fill = "lightblue"))+ggtitle("                                                 iris data")+labs(x="Sepal length",y="Petal length")+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+k
+```
+
+```{r}
+library(tidyverse)
+library(forecast)
+library(highcharter)
+library(ggplot2)
+g<-seq(from=0,to=20,length.out=100)
+cos(g)%>%forecast%>%hchart()
+rd<-list(g,cos(g))
+
+
+```
+
+```{r}
+library(tidyverse)
+library(highcharter)
+x2<- c(1:5)
+y2<- c(1:5)
+
+plot(x2,y2, type = "b")%>%
+  abline(h=c(2,4), col="red",lty=2)%>%
+  segments(x0=c(2,4),y0=c(2,2),x1=c(2,4),y1=c(4,4),
+           col="red", lty = 2)
+  arrows(x0=1.5,y0=4.5,x1=2.7,y1=3.25, col="darkblue")
+```
+
+```{r}
+plot(faithful)
+eruptions4<- with(faithful,faithful[eruptions > 4,])
+points(eruptions4,col="darkred",pch=18)
+```
+
+```{r}
+library(forecast)
+library(highcharter)
+fun5=(sin(seq(from=-2*pi,to=2*pi,length.out = 50)))%>%forecast()%>%plot()
+```
+
+
+```{r}
+getContent <- function(url) {
+  library(httr)
+  content(GET(url))
+}
+
+world <- getContent("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json")
+# is text
+world <- jsonlite::fromJSON(world, simplifyVector = FALSE)
+
+# http://cedeusdata.geosteiniger.cl/layers/geonode:mundo_corrientes_maritimas
+marine <- getContent("http://cedeusdata.geosteiniger.cl/geoserver/wfs?srsName=EPSG%3A4326&typename=geonode%3Amundo_corrientes_maritimas&outputFormat=json&version=1.0.0&service=WFS&request=GetFeature")
+# marine <- geojsonio::as.json(marine)
+
+
+# http://cedeusdata.geosteiniger.cl/layers/geonode:mundo_limites_placas
+plates <- getContent("http://cedeusdata.geosteiniger.cl/geoserver/wfs?srsName=EPSG%3A4326&typename=geonode%3Amundo_limites_placas&outputFormat=json&version=1.0.0&service=WFS&request=GetFeature")
+# plates <- geojsonio::as.json(plates)
+
+# http://cedeusdata.geosteiniger.cl/layers/geonode:mundo_volcanes
+volcano <- getContent("http://cedeusdata.geosteiniger.cl/geoserver/wfs?srsName=EPSG%3A4326&typename=geonode%3Amundo_volcanes&outputFormat=json&version=1.0.0&service=WFS&request=GetFeature")
+# volcano <- geojsonio::as.json(volcano)
+highchart(type = "map") %>%
+  hc_chart(backgroundColor = "#161C20") %>% 
+  hc_add_series(mapData = world, showInLegend = FALSE, nullColor = "#424242",
+                borderWidth = 0) %>%
+  hc_add_series(data = marine, type = "mapline", geojson = TRUE,
+                color = "#2980b9", name = "Marine currents",
+                tooltip = list(pointFormat = "{point.properties.NOMBRE}")) %>%
+  hc_add_series(data = plates, type = "mapline", lineWidth = 2, zIndex = -1, geojson = TRUE,
+                color = "#d35400", name = "Plates",
+                tooltip = list(pointFormat = "{point.properties.TIPO}")) %>%
+  hc_add_series(data = volcano, type = "mappoint", color = hex_to_rgba("#f1c40f", 0.4),
+                geojson = TRUE, name = "Volcanos",
+                tooltip = list(pointFormat = "{point.properties.NOMBRE}"),
+                marker = list(lineWidth = 0, radius = 2))
+```
+
+
+
+```{r}
+library(highcharter)
+highchart() %>% 
+  hc_title(text = "I'm a pirate looking chart created by Joel Rodriguez") %>% 
+  hc_xAxis(categories = month.abb) %>% 
+  hc_defs(patterns = list(
+    list(id = 'custom-pattern',
+         path = list(d = 'M 0 0 L 10 10 M 9 -1 L 11 1 M -1 9 L 1 11',
+                     stroke = "black",
+                     strokeWidth = 1
+         )
+    )
+  )) %>% 
+  hc_add_series(data = cos(seq(from=-2*pi,to=2*pi,length.out = 50)),
+                type = "area",
+                fillColor = 'url(#custom-pattern)') %>% 
+  hc_add_theme(hc_theme_handdrawn())
+```
+
+```{r}
+library(highcharter)
+highchart() %>% 
+  hc_title(text = "I'm a pirate looking chart") %>% 
+  hc_xAxis(categories = month.abb) %>% 
+  hc_defs(patterns = list(
+    list(id = 'custom-pattern',
+         path = list(d = 'M 0 0 L 10 10 M 9 -1 L 11 1 M -1 9 L 1 11',
+                     stroke = "black",
+                     strokeWidth = 1
+         )
+    )
+  )) %>% 
+  hc_add_series(data = c(7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2,
+                         26.5, 23.3, 18.3, 13.9, 9.6),
+                type = "area",
+                fillColor = 'url(#custom-pattern)') %>% 
+  hc_add_theme(hc_theme_handdrawn())
+```
+
+```{r}
+library(highcharter)
+highchart() %>% 
+  hc_title(text = "I'm a pirate looking chart") %>% 
+  hc_xAxis(categories = month.abb) %>% 
+  hc_defs(patterns = list(
+    list(id = 'custom-pattern',
+         path = list(d = 'M 0 0 L 10 10 M 9 -1 L 11 1 M -1 9 L 1 11',
+                     stroke = "black",
+                     strokeWidth = 1
+         )
+    )
+  )) %>% 
+  hc_add_series(data = c(7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2,
+                         26.5, 23.3, 18.3, 13.9, 9.6),
+                type = "area",
+                fillColor = 'url(#custom-pattern)') %>% 
+  hc_add_theme(hc_theme_handdrawn())
+
+```
+
+
+```{r}
+library("shiny")
+library("highcharter")
+
+data(citytemp)
+
+ui <- fluidPage(
+  h1("Highcharter Demo"),
+  fluidRow(
+    column(width = 4, class = "panel",
+           selectInput("type", label = "Type", width = "100%",
+                       choices = c("line", "column", "bar", "spline")), 
+           selectInput("stacked", label = "Stacked",  width = "100%",
+                       choices = c(FALSE, "normal", "percent")),
+           selectInput("theme", label = "Theme",  width = "100%",
+                       choices = c(FALSE, "fivethirtyeight", "economist",
+                                   "darkunica", "gridlight", "sandsignika",
+                                   "null", "handdrwran", "chalk")
+           )
+    ),
+    column(width = 8,
+           highchartOutput("hcontainer",height = "500px")
+    )
+  )
+)
+
+server = function(input, output) {
+  
+  output$hcontainer <- renderHighchart({
+    
+    hc <- hc_demo() %>%
+      hc_rm_series("Berlin") %>% 
+      hc_chart(type = input$type)
+    
+    if (input$stacked != FALSE) {
+      hc <- hc %>%
+        hc_plotOptions(series = list(stacking = input$stacked))
+    }
+    
+    if (input$theme != FALSE) {
+      theme <- switch(input$theme,
+                      null = hc_theme_null(),
+                      darkunica = hc_theme_darkunica(),
+                      gridlight = hc_theme_gridlight(),
+                      sandsignika = hc_theme_sandsignika(),
+                      fivethirtyeight = hc_theme_538(),
+                      economist = hc_theme_economist(),
+                      chalk = hc_theme_chalk(),
+                      handdrwran = hc_theme_handdrawn()
+      )
+      
+      hc <- hc %>% hc_add_theme(theme)
+      
+    }
+    
+    hc
+    
+  })
+  
+}
+
+shinyApp(ui = ui, server = server)
+
+```
+
+```{r}
+library("highcharter")
+set.seed(123)
+
+icons <- c("motorcycle", "taxi", "bus", "plane")
+
+n <- sample(3:10, length(icons)) %>% 
+  sort(decreasing = TRUE) %>% 
+  {. *  seq(length(icons), 1) } 
+
+hciconarray(icons, n, icons = icons, size = 5)
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+library("highcharter")
+library("idbr")
+library("purrr")
+library("dplyr")
+
+idb_api_key("35f116582d5a89d11a47c7ffbfc2ba309133f09d")
+yrs <-  seq(1980, 2030, by = 5)
+
+df <- map_df(c("male", "female"), function(sex){
+  mutate(idb1("US", yrs, sex = sex), sex_label = sex)
+})
+
+names(df) <- tolower(names(df))
+
+df <- df %>%
+  mutate(population = pop*ifelse(sex_label == "male", -1, 1))
+
+series <- df %>% 
+  group_by(sex_label, age) %>% 
+  do(data = list(sequence = .$population)) %>% 
+  ungroup() %>% 
+  group_by(sex_label) %>% 
+  do(data = .$data) %>%
+  mutate(name = sex_label) %>% 
+  list_parse()
+
+maxpop <- max(abs(df$population))
+
+xaxis <- list(categories = sort(unique(df$age)),
+              reversed = FALSE, tickInterval = 5,
+              labels = list(step = 5))
+
+highchart() %>%
+  hc_chart(type = "bar") %>%
+  hc_motion(enabled = TRUE, labels = yrs, series = c(0,1), autoplay = TRUE, updateInterval = 1) %>% 
+  hc_add_series_list(series) %>% 
+  hc_plotOptions(
+    series = list(stacking = "normal"),
+    bar = list(groupPadding = 0, pointPadding =  0, borderWidth = 0)
+  ) %>% 
+  hc_tooltip(shared = TRUE) %>% 
+  hc_yAxis(
+    labels = list(
+      formatter = JS("function(){ return Math.abs(this.value) / 1000000 + 'M'; }") 
+    ),
+    tickInterval = 0.5e6,
+    min = -maxpop,
+    max = maxpop) %>% 
+  hc_xAxis(
+    xaxis,
+    rlist::list.merge(xaxis, list(opposite = TRUE, linkedTo = 0))
+  ) %>% 
+  hc_tooltip(shared = FALSE,
+             formatter = JS("function () { return '<b>' + this.series.name + ', age ' + this.point.category + '</b><br/>' + 'Population: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);}")
+  ) 
+```
+```{r}
+library(highcharter)
+library(forecast)
+a<- cos(seq(from= -2*pi, to = 2*pi, length.out=500))
+a%>%forecast%>%hchart()
+```
+```{r}
+library(ggplot2)
+diamonds
+ggplot(diamonds,aes(x=cut,color=color,alpha=clarity,size=price))+geom_bar()
+
+ggplot(diamonds,aes(x=cut,y=carat,fill=price))+geom_boxplot()+geom_jitter()+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white"))
+```
+
+```{r}
+library(prismadiagramR)
+library(dplyr)
+
+
+set.seed(25)
+N <- 100
+studyStatus <- data.frame(Pub.ID = seq(1:N),
+                          Source = sample(letters[1:3], N, replace = TRUE),
+                          Filter = sample(letters[1:5], N, replace = TRUE))
+studyStatus$Filter[studyStatus$Filter=="e"] <- NA
+getPrisma(studyStatus) %>% DiagrammeR::grViz(.)
+```
+
+```{r}
+prismaFormat <- getPrismaFormat(studyStatus)
+flextable::flextable(prismaFormat)
+```
+
+```{r}
+prismaFormat <-
+  data.frame(
+    prismaLvl = c(1,2,3,3,4),
+    nodeType =  c("Source", "Node", "Node", "Filter", "End"),
+    prismaTxt = letters[1:5]
+  )
+
+getPrisma(studyStatus = NULL, prismaFormat = prismaFormat) %>% DiagrammeR::grViz(.)
+```
+
+```{r}
+text <- c("Because I could not stop for Death -",          "He kindly stopped for me -",          "The Carriage held but just Ourselves -",          "and Immortality")
+text
+```
+
+```{r}
+library(gutenbergr)
+physics <- gutenberg_download(c(37729, 14725, 13476, 5001),                              meta_fields = "author") 
+```
+
+```{r}
+require(vistime)
+timeline_data <- data.frame(event=c("Event 1", "Event 2"), start = c("2020-06-06", "2020-10-01"), end = c("2020-10-01", "2020-12-31"), group = "My Events")
+vistime(timeline_data)
+```
+
+```{r}
+library(dplyr)
+library(DT)
+library(forecast)
+library(highcharter)
+library(plotly)
+#original data
+data.frame(AirPassengers)
+#creating a data frame
+air_passangers<- data.frame(matrix(AirPassengers,
+                                   ncol=12,
+                                   byrow = TRUE,
+                                   dimnames = list(as.character(1:12),month.abb)))
+air_passangers$year<-1949:1960
+#reorder columns
+air_passangers<- air_passangers%>%select(year,everything())
+#max for each variable
+max_flights<-air_passangers%>%summarise_all(max)
+#max for each month
+max_flights_month<- air_passangers%>%summarise_if(is.numeric,max)
+max_flights_month
+#mean flights
+mean_flights_month_j<- air_passangers%>%summarise_at(vars(starts_with("j")),mean)
+
+#add columns for the first month with their medians
+air_passangers<- air_passangers%>%
+  mutate_at(vars(one_of(month.abb[1:3])),funs(med=median))
+
+
+air_passangers
+
+r<-ggplot(air_passangers,aes(x=year,y=Feb,size=year,color=year,alpha=year))+geom_point()
+ggplotly(r)
+
+```
+
+```{r}
+library(DT)
+library(ggplot2)
+air_passangers<- data.frame(matrix(AirPassengers,
+                  ncol=12,
+                  byrow = FALSE,
+                  dimnames=list(as.character(1:12),c("Jan" ,"Feb", "Mar", "Apr" ,"May" ,"Jun" ,"Jul", "Aug", "Sep" ,"Oct" ,"Nov", "Dec"))))
+
+#ggplot(air_passangers,aes(x=air_passangers))+geom_boxplot()
+
+air_passangers
+
+```
+
+```{r}
+noquote("(•_•)")
+noquote("<)   )╯shot")
+noquote(" /   \ ")
+
+
+
+noquote(" (•_•) ")
+noquote("<)   )> chaser.")
+noquote(" /    \ ")
+```
+
+```{r}
+plot(faithful)
+
+eruptions4<- with(faithful,faithful[eruptions<4,])
+
+
+points(eruptions4,col="darkred",pch=18)
+```
+
+```{r}
+#cars4<- [cars$cars.dist,cars$cars.time]
+plot(cars$cars.dist,cars$cars.time)
+cars5<-with(cars,cars[cars.dist>40,])
+points(cars5,col="darkred",pch=18)
+```
+
+```{r}
+data()
+
+
+```
+
+```{r}
+library(dplyr)
+library(DT)
+library(forecast)
+library(highcharter)
+library(plotly)
+library(tidyverse)
+
+data.frame(chickwts)
+aa2<-ggplot(chickwts,aes(y=weight,x=feed,fill=feed))+geom_boxplot()+geom_jitter()
+ggplotly(aa2)
+```
+
+```{r}
+library(dplyr)
+library(DT)
+library(forecast)
+library(highcharter)
+library(plotly)
+library(tidyverse)
+
+data.frame(chickwts)
+chickwts_frame<- ggplot(chickwts,aes(y=weight,x=feed))+geom_density(color="darkblue", fill="blue",alpha=0.2)+scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"))
+chickwts_frame
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

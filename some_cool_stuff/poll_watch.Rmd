@@ -1,0 +1,575 @@
+---
+title: "Poll watch"
+output: html_notebook
+---
+
+Connecting to the postgres sql database
+
+```{r}
+
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+
+password = "Kingjames1611"
+DBI::dbDriver('PostgreSQL')
+drv=dbDriver("PostgreSQL")
+con=dbConnect(drv,dbname="practical_sql",
+              host="localhost",
+              port=5432,
+              user="postgres",
+              password=password)
+
+dbListTables(conn = con)
+```
+using the database
+```{r}
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+
+## Actual code for automating the database
+
+query = "(
+
+select  
+        question_id,
+		poll_id,
+		cycle,
+		state,
+		pollster_id::float::numeric,
+		pollster,
+		sponsors,
+		display_name,
+		pollster_rating_id,
+		pollster_rating_name,
+		fte_grade,
+		sample_size::float8::numeric::double precision--when applicable,
+		population,
+		population_full,methodology,
+		office_type,
+		start_date::date,
+		end_date::date,
+		election_date::date,
+		internal,
+		partisan,
+		tracking,
+		nationwide_batch,
+		ranked_choice_reallocated,
+		created_at::timestamptz::timestamp::timestamptz,
+		notes,
+		url as source,
+		race_id,
+		answer,
+		candidate_party,
+		pct::float8::numeric::double precision--when applicable
+
+
+
+from poll_watch
+where candidate_party = 'REP'
+or candidate_party = 'DEM'
+and created_at > '2020-09-15'
+
+order by end_date desc,
+         start_date,
+         methodology
+
+
+
+
+
+
+
+
+)"
+
+
+#processing the query
+
+result_db<- RPostgreSQL::dbGetQuery(conn = con,statement = query)
+result_db
+```
+
+
+Keep in mind that you can also plot the information contained in the database right here in R.
+
+```{r}
+
+summary(result_db)
+```
+
+
+```{r}
+library(ggplot2)
+library(esquisse)
+library(gganimate)
+
+
+#esquisser(result_db
+library(dplyr)
+library(ggplot2)
+
+p<-result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = "", y = pct, fill = candidate_party) +
+ geom_boxplot() +
+ scale_fill_hue() +
+ theme_classic()+labs(x = "candidate's party", y = "percentage", title = "Boxplot track of 2020 presidential election", caption = "Prepared by Joel Rodriguez")+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+
+p+transition_time(start_date) +
+  ease_aes() #+
+  #transition_time(candidate_party) +
+ # ease_aes('linear')
+
+```
+
+
+```{r}
+
+library(esquisse)
+library(gganimate)
+library(dplyr)
+library(ggplot2)
+
+p<-result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = "", y = pct, fill = candidate_party) +
+ geom_boxplot() +
+ scale_fill_hue() +
+ theme_classic()+labs(x = "candidate's party", y = "percentage", title = "Boxplot track of 2020 presidential election", caption = "Prepared by Joel Rodriguez")
+ p+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+
+
+```
+
+
+```{r}
+
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+mult<- result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = answer, y = pct, fill = candidate_party) +
+ geom_boxplot() +
+ scale_fill_hue() +
+ theme_minimal() +
+ facet_wrap(vars(state))+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+ggplotly(mult)
+```
+
+
+```{r}
+library(ggplot2)
+library(esquisse)
+library(plotly)
+
+AA<- result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = candidate_party) +
+ geom_density(adjust = 1L) +
+ scale_fill_hue() +
+ labs(x = "Percentage", y = "Density", title = "Density Plot presidential election 2020",caption = "Prepared by Joel Rodriguez") +
+ theme_minimal()
+
+
+ggplotly(AA)
+```
+
+
+```{r}
+library(gganimate)
+result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = "", y = pct, fill = candidate_party) +
+ geom_violin(adjust = 1L, scale = "area") +
+ scale_fill_hue() +
+ labs(x = "Percentage", y = "Density", title = "Density Plot presidential election 2020",caption = "Prepared by Joel Rodriguez") +
+ theme_minimal()+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))+transition_time(start_date) +
+  ease_aes()+transition_time(start_date) +
+  ease_aes() 
+
+```
+
+
+```{r}
+library(gganimate)
+library(plotly)
+A<- result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = "", y = pct, fill = candidate_party) +
+ geom_violin(adjust = 1L, scale = "area") +
+ scale_fill_hue() +
+ labs(x = "Percentage", y = "Density", title = "Density Plot presidential election 2020",caption = "Prepared by Joel Rodriguez") +
+ theme_minimal()
+
+ggplotly(A)
+
+```
+
+
+```{r}
+result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = candidate_party) +
+ geom_histogram(bins = 28L) +
+ scale_fill_brewer(palette = "Set1") +
+ labs(x = "Percentage", y = "Density", title = "Density Plot presidential election 2020",caption = "Prepared by Joel Rodriguez") +
+ theme_minimal() +
+ theme(legend.position = "none")+transition_time(start_date) +
+  ease_aes()
+
+
+```
+
+
+
+```{r}
+g4<- result_db %>%
+ filter(created_at >= 
+          "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct,
+     fill = candidate_party,fill= candidate_party) +
+ geom_histogram(bins = 28L) +
+ scale_fill_brewer(palette = "Set1") +
+ labs(x = "Percentage",
+      y = "Density", 
+      title = "Density Plot presidential election 2020",caption = "Prepared by Joel Rodriguez") +
+ theme_minimal() +
+ theme(legend.position = "none")+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+
+
+ggplotly(g4)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+pk<- result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = answer) +
+ geom_density(adjust = 0.2) +
+ scale_fill_hue() +
+ theme_minimal()+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))+ labs(x = "percentage", title = "Plots divided by candidate",caption = "Prepared by Joel Rodriguez")
+
+ggplotly(pk)
+```
+
+
+
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = answer) +
+ geom_density(adjust = 0.2) +
+ scale_fill_hue() + labs(x = "percentage", title = "Plots divided by candidate",caption = "Prepared by Joel Rodriguez")
+ theme_minimal()
+```
+
+
+```{r}
+pk<- result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = answer) +
+ geom_density(adjust = 6L) +
+ scale_fill_hue() +
+ theme_minimal() +
+ facet_wrap(vars(population_full))+ labs(x = "percentage", title = "Plots divided by methodology",caption = "Prepared by Joel Rodriguez")+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+
+ggplotly(pk)
+```
+```{r}
+library(forecast)
+library(dplyr)
+#library(highcharter)
+library(tidyselect)
+library(esquisse)
+
+
+a = result_db$pct
+a%>%forecast%>%plot()
+
+
+```
+
+
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(dplyr)
+library(ggplot2)
+
+result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = candidate_party) +
+ geom_density(adjust = 1L) +
+ scale_fill_viridis_d(option = "plasma") +
+ theme_minimal()+ labs(x = "percentage", title = "Plots divided by methodology",caption = "Prepared by Joel Rodriguez")+transition_time(start_date) +
+  ease_aes())
+
+
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+g3<- result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = candidate_party) +
+ geom_density(adjust = 1L) +
+ scale_fill_viridis_d(option = "plasma") +
+ theme_minimal()+ labs(x = "percentage", title = "Plots divided by methodology",caption = "Prepared by Joel Rodriguez") + theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+
+ggplotly(g3)
+
+
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+result_db %>%
+ filter(created_at >=
+          "2020-09-18 09:12:00" &
+          created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = candidate_party) +
+ geom_histogram(bins = 30L) +
+ scale_fill_viridis_d(option = "cividis") +
+ labs(x = "percentage", title = "Plots divided by methodology") +
+ theme_minimal() +
+ facet_wrap(vars(notes))+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = candidate_party) +
+ geom_density(adjust = 1L) +
+ scale_fill_viridis_d(option = "cividis") +
+ labs(x = "percentage", title = "Plots divided by methodology") +
+ theme_minimal() +
+ facet_wrap(vars(notes))+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+g1<- result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = candidate_party) +
+ geom_density(adjust = 1L) +
+ scale_fill_viridis_d(option = "cividis") +
+ labs(x = "percentage", title = "Plots divided by methodology") +
+ theme_minimal() +
+ facet_wrap(vars(tracking)) + theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+ggplotly(g1)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(dplyr)
+library(ggplot2)
+
+result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = pct, fill = display_name, colour = partisan) +
+ geom_histogram(bins = 29L) +
+ scale_fill_viridis_d(option = "viridis") +
+ scale_color_viridis_d(option = "viridis") +
+ theme_minimal()
+```
+
+
+```{r}
+result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = answer, y = pct, colour = candidate_party) +
+ geom_boxplot(fill = "#238b45") +
+ scale_color_viridis_d(option = "cividis") +
+ labs(x = "Candidates",y='percentage', title = "Plots divided by methodology",caption = "Prepared by Joel Rodriguez") +
+ theme_bw() +
+ facet_wrap(vars(candidate_party), scales = "free_x")+transition_time(start_date) +
+  ease_aes() + theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+
+
+
+```
+
+
+```{r}
+library(plotly)
+gg<- result_db %>%
+ filter(created_at >= "2020-09-18 09:12:00" & created_at <= "2020-10-01 17:02:00") %>%
+ ggplot() +
+ aes(x = answer, y = pct, colour = candidate_party) +
+ geom_boxplot(fill = "#238b45") +
+ scale_color_viridis_d(option = "cividis") +
+ labs(y= "percentage",x= 'candidates' , "Plots divided by methodology",caption = "Prepared by Joel Rodriguez") +
+ theme_bw() +
+ facet_wrap(vars(candidate_party), scales = "free_x") +
+  
+  theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+
+
+ggplotly(gg)
+```
+
+
+
+
+```{r}
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+
+#dbDisconnect(con)
+
+```
+

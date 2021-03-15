@@ -1,0 +1,39 @@
+---
+title: "Element Engineering location with respect to my house."
+output: html_notebook
+---
+
+Basic Map For element Engineering.
+From this map we will create some other maps that will derive from this one (allow me to be repetitive).
+
+```{r}
+library(leaflet)
+
+element<- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=-82.439640, lat=27.961470222, popup="Element Engineering. This is the place I work at. ~ Joel")%>%
+  addMarkers(lng=-82.576370, lat=28.082050,popup="This is my house with respect to the Office")
+element  # Print the map
+```
+Another great example but in a much simpler form.
+
+```{r}
+element %>% addProviderTiles(providers$CartoDB.Positron)
+```
+Black and white example
+```{r}
+element %>% addProviderTiles(providers$Stamen.Toner)
+```
+Examples with tile.
+```{r}
+element %>% addProviderTiles(providers$MtbMap) %>%
+  addProviderTiles(providers$Stamen.TonerLines,
+    options = providerTileOptions(opacity = 0.35)) %>%
+  addProviderTiles(providers$Stamen.TonerLabels)
+
+
+
+element<- leaflet() %>% addTiles()
+```
+
+Created and developed by Joel Rodriguez as an example for Element Engineering. 

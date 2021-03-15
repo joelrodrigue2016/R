@@ -1,0 +1,54 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+
+password = "Kingjames1611"
+DBI::dbDriver('PostgreSQL')
+drv=dbDriver("PostgreSQL")
+con=dbConnect(drv,dbname="dvdrental",
+              host="localhost",
+              port=5432,
+              user="postgres",
+              password=password)
+
+dbListTables(conn = con)
+```
+
+```{r}
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+library(DT)
+
+
+## Actual code for automating the database
+
+query = "(
+Select *
+from film
+limit 100
+
+
+)"
+
+
+#processing the query
+
+result<- dbGetQuery(conn = con,statement = query)
+datatable(result)
+```
+```{r}
+library(odbc)
+library(DBI)
+library(RPostgreSQL)
+
+dbDisconnect(con)
+```
+

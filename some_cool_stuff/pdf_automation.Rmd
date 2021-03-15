@@ -1,0 +1,13 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library("pdftools")
+library(pdftools)
+pdf_file <- "https://help.trimblegeospatial.com/TALegacy/Help%20Files/2014_10/English/TAHelp.pdf"
+txt <- pdf_text(pdf_file)
+#cat(txt[1]) # text in table form
+txt
+```

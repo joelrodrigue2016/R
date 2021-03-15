@@ -1,0 +1,36 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(rvest)
+library (tidyverse)
+library(reactable)
+library(DT)
+
+
+
+google_news <- read_html("https://news.google.com/topstories?hl=en-US&gl=US&ceid=US:en")
+
+
+```
+
+```{r}
+
+google_news = google_news%>%
+  html_nodes(".xP6mwf")%>%
+  html_text()
+
+
+```
+
+```{r}
+google_news
+```
+
+```{r}
+
+```
+

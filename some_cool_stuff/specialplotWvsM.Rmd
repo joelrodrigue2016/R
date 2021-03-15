@@ -1,0 +1,78 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is carsan [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(DT)
+library(ggplot2)
+library(plotly)
+library(tidyverse)
+
+dd<- ggplot(data=cars,mapping=aes(x=cars.dist,y=cars.time,color=cars.speed,size=cars.time,alpha=cars.speed))+geom_point()+ggtitle("Relationship between time and distance in a car")+labs(x="distance",y="time")
+dd
+
+
+```
+
+```{r}
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+
+Formaldehyde%>%plot(type="o")
+
+#ggplot(Billboard_data,aes(x=wk1,y=date.entered,color=wk2,alpha=wk3))+geom_point()
+```
+```{r}
+HairEyeColor
+hair_f<- data.frame(HairEyeColor)
+ggplot(hair_f,aes(x=Freq,y=Eye,color=Sex,alpha=Freq))+geom_boxplot()+geom_jitter()
+```
+
+
+```{r}
+women
+ggplot(women,aes(x=weight,y=height,color=height))+geom_point()
+```
+
+
+```{r}
+attitude2<-data.frame(attitude)
+attitude2
+
+ggplot(attitude2,aes(x=rating,y=complaints))+geom_point()
+```
+
+
+```{r}
+d<-density(cars$cars.dist)
+plot(d)
+polygon(d,col = "red",border = "green")
+
+ggplot(cars, aes(x=cars$cars.dist))+
+  geom_density(color="blue", fill="red",alpha=0.2)+scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"))
+```
+```{r}
+WWWusage   
+```
+
+
+```{r}
+boxplot(WWWusage)
+```
+
+
+```{r}
+data.frame(relig_income )
+plot(relig_income$religion,everything)
+```
+
+```{r}
+data()
+```
+

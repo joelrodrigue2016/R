@@ -1,0 +1,21 @@
+
+
+```{r}
+library(igraph)
+edges = rbind(c("Dave","Jenny"),c("Pete","Jenny"),c("John","Jenny"),
+              c("Dave","Peter"),c("Dave","John"),c("Peter","Sam"), c("Joel", "Pete"),c("Joel","Stephanie"),c("Liam",	"Emma"),c("Emma",	"Olivia"),c("William"	,"Liam"),c("James"	,"Emma"),c("Oliver",	"Liam"),c("Benjamin",	"Liam"),c("Elijah",	"James"),c("James",	"Amelia"),c("Emma",	"Harper"),c("Emma",	"Evelyn"), c("Emma", "Jenny"),c("Emma","Stephanie"))
+
+g = graph.edgelist(edges,directed = TRUE)
+
+plot(g,vertex.size = 1,vertex.label.dist = 0.1)
+
+
+
+data.frame(edges)
+
+```
+
+```{r}
+
+```
+

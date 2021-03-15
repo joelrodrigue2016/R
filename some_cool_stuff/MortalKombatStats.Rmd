@@ -1,0 +1,88 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+require(highcharter)
+require(forecast)
+require(ggplot2)
+require(plotly)
+library(tidyverse)
+#setwd("/Users/steph/OneDrive/Documents/R Projeccts")
+MK<- read_csv("MortalKombatStats.csv")
+MK
+
+
+#ratings$Real<-ratings$Rating*ratings$`(000s)`
+#ratings
+#ratings[!complete.cases(ratings),] every  case is complete
+
+```
+```{r}
+library("highcharter")
+library("idbr")
+library("purrr")
+library("dplyr")
+library("ggplot2")
+MKplot<- ggplot(MK,aes(x=Score,y=`Total players`,color=`Character name`,alpha=MK$`Percentage played`,size=S1))+geom_point()+ggtitle("Most skillful Mortal Kombat players")+labs(x="Score given by player",y="Rate")+theme(plot.background = element_rect(fill = "lightgreen"))+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white"))
+
+MKplot
+ggplotly(MKplot)
+
+
+```
+
+
+```{r}
+MKplot<- ggplot(MK,aes(y=Score,x=MK$`Percentage played`,color=`Character name`))+geom_point()+ggtitle("MK playability")+labs(x="the most preferred fighters", y="Score")+   theme(plot.background = element_rect(fill = 'lightgreen'))+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white"))
+
+ggplotly(MKplot)
+```
+
+
+```{r}
+MKplot<- ggplot(MK,aes(y=Score,x=MK$`Percentage played`,color=`Character name`))+geom_count()+ggtitle("Most skillful Mortal Kombat players")+labs(x="the most preferred fighters", y="Score")+   theme(plot.background = element_rect(fill = 'pink'))+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white"))
+
+ggplotly(MKplot)
+```
+
+
+```{r}
+MKplot<- ggplot(MK,aes(y=Score,x=MK$`Percentage played`,color=`Character name`))+geom_count()+ggtitle("Most skillful Mortal Kombat players")+labs(x="the most preferred fighters", y="Score")+theme(plot.background = element_rect(fill = 'lightblue'))+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white"))
+
+ggplotly(MKplot)
+```
+

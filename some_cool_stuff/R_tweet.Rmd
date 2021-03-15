@@ -1,0 +1,56 @@
+---
+title: "Twitter API"
+output: html_notebook
+---
+ 
+
+```{r}
+# If you need to install any of these:
+# install.packages("rtweet")
+#install.packages("reactable")
+#install.packages("glue")
+#install.packages("stringr")
+#install.packages("httpuv")
+#install.packages("dplyr")
+#install.packages("purrr")
+library(rtweet)
+library(dplyr)
+```
+
+```{r}
+tweet_df <- search_tweets("#water", ## insert the word with a hashtag
+            n = 200,  # amount of data (tweet) you want 
+            include_rts = FALSE)
+
+data.frame(tweet_df)
+#write.csv(tweet_df,"tweet_analysis.csv")
+```
+
+```{r}
+tweet_table_data <- select(tweet_df, -user_id, -status_id)
+library(reactable)
+reactable(tweet_table_data)
+```
+
+
+```{r}
+reactable(tweet_table_data, 
+          filterable = TRUE, searchable = TRUE, bordered = TRUE, 
+          striped = TRUE, highlight = TRUE,
+          defaultPageSize = 25, showPageSizeOptions = TRUE, 
+          showSortable = TRUE, pageSizeOptions = c(25, 50, 75, 100, 200), defaultSortOrder = "desc",
+            columns = list(
+            created_at = colDef(defaultSortOrder = "asc"),
+            screen_name = colDef(defaultSortOrder = "asc"),
+            text = colDef(html = TRUE, minWidth = 190, resizable = TRUE),
+            favorite_count = colDef(filterable = FALSE),
+            retweet_count = colDef(filterable =  FALSE),
+            urls_expanded_url = colDef(html = TRUE)
+          )
+) 
+```
+
+```{r}
+
+```
+

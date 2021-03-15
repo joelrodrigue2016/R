@@ -1,0 +1,209 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Loading the data
+```{r}
+#library(tidyverse)
+#getwd()
+library(tidyverse)
+setwd("/Users/steph/OneDrive/Documents/R Projeccts")
+ratings<- read_csv("ratings.csv")
+
+
+ratings$Real<-ratings$Rating*ratings$`(000s)`
+ratings
+#ratings[!complete.cases(ratings),] every  case is complete
+
+```
+Cleaning the data
+
+
+
+```{r}
+library(tidyverse)
+library(DT)
+library(plotly)
+#lets try to make a comparison btw CNN and Fox and also those that aren't cnn or fox
+CNN <- ratings %>%
+  select(Rank,
+         Program,
+         Net,
+         Start,
+         Rating,`(000s)`,Real) %>%
+  filter(Net=="CNN")
+
+
+FOX <- ratings %>%
+  select(Rank,
+         Program,
+         Net,
+         Start,
+         Rating,`(000s)`,Real) %>%
+  filter(Net=="FOX NEWS CHANNEL")
+MSNBC<- ratings %>%
+  select(Rank,
+         Program,
+         Net,
+         Start,
+         Rating,`(000s)`,Real) %>%
+  filter(Net=="MSNBC")
+
+Others <- ratings %>%
+  select(Rank,
+         Program,
+         Net,
+         Start,
+         Rating,`(000s)`,Real) %>%
+  filter(Net!=c("FOX NEWS CHANNEL","CNN","MSNBC"))
+
+  #filter(Net!="FOX NEWS CHANNEL" & Net!="CNN" & Net!="MSNBC")
+datatable(CNN)
+datatable(FOX)
+datatable(MSNBC)
+data.frame(Others)
+
+FOX_plot<- ggplot(data=FOX,aes(x=Rating,y=Real, color=FOX$Program))+geom_point()+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+ggplotly(FOX_plot)
+
+CNN_plot<- ggplot(data=CNN,aes(x=Rating,y=Real, color=Program))+geom_point()+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+ggplotly(CNN_plot)
+
+MSNBC_plot<- ggplot(data=MSNBC,aes(x=Rating,y=Real, color=Program))+geom_point()+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+ggplotly(MSNBC_plot)+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+
+Others_plot<- ggplot(data=Others,aes(x=Rating,y=Real,color=Program))+geom_point()+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+theme(plot.background = element_rect(fill = "lightblue"))
+ggplotly(Others_plot)
+
+```
+
+```{r}
+noquote("This is the summary of ratings from shows not related to CNN or Fox News")
+noquote("-----------------------------------------------------------------------------------")
+
+summary(Others)
+noquote("This is the summary of ratings from shows related to CNN")
+noquote("-----------------------------------------------------------------------------------")
+summary(CNN)
+
+noquote("This is the summary of ratings from shows related to Fox News")
+noquote("-----------------------------------------------------------------------------------")
+
+summary(FOX)
+noquote("-----------------------------------------------------------------------------------")
+
+```
+
+
+```{r}
+Others_plot<- ggplot(data=Others,aes(x=Rating,y=Real,color=Program))+geom_point()+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+ggplotly(Others_plot)
+```
+
+```{r}
+deck <- data.frame(
+ face = c("king", "queen", "jack", "ten", "nine", "eight", "seven", "six",
+ "five", "four", "three", "two", "ace", "king", "queen", "jack", "ten",
+ "nine", "eight", "seven", "six", "five", "four", "three", "two", "ace",
+ "king", "queen", "jack", "ten", "nine", "eight", "seven", "six", "five",
+ "four", "three", "two", "ace", "king", "queen", "jack", "ten", "nine",
+ "eight", "seven", "six", "five", "four", "three", "two", "ace"),
+ suit = c("spades", "spades", "spades", "spades", "spades", "spades",
+ "spades", "spades", "spades", "spades", "spades", "spades", "spades",
+ "clubs", "clubs", "clubs", "clubs", "clubs", "clubs", "clubs", "clubs",
+ "clubs", "clubs", "clubs", "clubs", "clubs", "diamonds", "diamonds",
+ "diamonds", "diamonds", "diamonds", "diamonds", "diamonds", "diamonds",
+ "diamonds", "diamonds", "diamonds", "diamonds", "diamonds", "hearts",
+ "hearts", "hearts", "hearts", "hearts", "hearts", "hearts", "hearts",
+ "hearts", "hearts", "hearts", "hearts", "hearts"),
+ value = c(13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 13, 12, 11, 10, 9, 8,
+ 7, 6, 5, 4, 3, 2, 1, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 13, 12, 11,
+ 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+)
+library(ggplot2)
+
+ggplot(deck,aes(value,fill=suit, alpha=value))+geom_boxplot()
+```
+
+```{r}
+library(plyr)
+set.seed(1)
+d <- data.frame(year = rep(2000:2002, each = 3),
+  count = round(runif(9, 0, 20)))
+print(d)
+ddply(d, "year", function(x) {
+  mean.count <- mean(x$count)
+  sd.count <- sd(x$count)
+  cv <- sd.count/mean.count
+  data.frame(cv.count = cv)
+})
+
+d
+```
+
+```{r}
+library(gcookbook) # For the data set
+library(plotly)
+gf<-ggplot(heightweight,aes(x=sex,y=heightIn,size=ageMonth,alpha=weightLb,color=sex))+geom_violin(trim=T)+
+ stat_summary(fun=median, geom="point", fill="white", shape=21, size=2.5)+geom_jitter()+theme(
+  panel.background = element_rect(fill = "lightblue",
+                                colour = "lightblue",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )+ggtitle("asd")
+ggplotly(gf)
+```
+

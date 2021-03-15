@@ -1,0 +1,40 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+. 
+This is a very simple way to create a regression in R
+```{r}
+x<- 1:50
+y<- x^3+5*x^2-cos(x)
+
+
+#now lets use lm to create a model
+model<- lm(x~y)
+summary(model)
+
+plot(model)
+```
+
+
+```{r}
+f<- function(x,y){
+  z<-x^2+y^2-3
+  return(z)
+}
+f(5,90)
+```
+```{r}
+library(hms)
+library(tidyverse)
+
+library(lubridate)
+library(nycflights13)
+
+while (TRUE) {
+  noquote(now())
+}
+
+
+```
+

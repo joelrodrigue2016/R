@@ -1,0 +1,94 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+library(odbc)
+library(RODBC)
+library(DBI)
+library(ggplot2)
+
+conn1<- odbcConnect("SQLServer_DSN",rows_at_time = 1)
+
+print(noquote("Connection has been established!"))
+```
+
+
+
+```{r}
+sqlTables(conn1)
+
+```
+
+
+```{r}
+
+library(odbc)
+library(RODBC)
+library(DBI)
+library(ggplot2)
+
+data <- sqlQuery(conn1,paste("
+                     
+
+
+
+select  *
+from    [dbo].[shipman_times]
+
+
+"))
+data
+```
+
+
+```{r}
+library(odbc)
+library(RODBC)
+library(DBI)
+library(ggplot2)
+library(esquisse)
+
+#esquisse::esquisser(data)
+
+ggplot(data, aes(Hour,Shipman,Comparison)) +        # False specification in ggplot
+  geom_point()
+
+```
+
+
+
+```{r}
+
+library(odbc)
+library(RODBC)
+library(DBI)
+library(ggplot2)
+
+p <- ggplot(data, aes(x=Hour, y)) + ylim(0,15) # constructs initial plot object, p
+p <- p + geom_line(aes(y = Comparison, col = "Comparison GPs"), size=1.5) # adds a y-series
+p <- p + geom_line(aes(y = Shipman, col = "Shipman"), size=1.5) # adds a y-series
+p <- p +  labs(title="Deaths by Hour of Day", subtitle="From Shipman database", y="% of Deaths", x="Hour of Day") # Adds title, subtitle
+p <- p + scale_colour_brewer(palette = "Set1") # sets the colour palette 
+p <- p + theme(legend.position="none")#, legend.box = "horizontal") # removes the legend
+
+p <- p + geom_text(aes(x = 11, y = 12, label = "Shipman", color = "Shipman"))
+p <- p + geom_text(aes(x = 4, y = 7, label = "Comparison GP's", color = "Comparison GPs"))
+p
+
+```
+
+```{r}
+library(odbc)
+library(RODBC)
+library(DBI)
+library(ggplot2)
+
+odbcClose(conn1)
+print("Connection has been closed!!!")
+
+```
+
